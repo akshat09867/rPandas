@@ -1,0 +1,21 @@
+Package: rPandas
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    c(
+        person("Akshat", "Maurya", , "codingmaster902@gmail.com", role = c("aut", "cre")),
+        person("Rihaan", "Satia", , "first.last@example.com", role = c("aut")),
+        person("David", "Shilane", , "david.shilane@columbia.edu", role = c("aut"))
+    )
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Suggests: 
+    ggplot2,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    reticulate,
+    rlang
