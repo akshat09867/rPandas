@@ -15,18 +15,12 @@
 #' @keywords internal
 create_pandas_statement <- function(df_name, filter_str = NULL, ...) {
   
-  # Start with the base DataFrame name
   command <- df_name
   
-  # Add a filter/query step if provided
   if (!is.null(filter_str) && nchar(filter_str) > 0) {
-    # CORRECTED: Use double quotes to wrap the query. This prevents
-    # conflicts with single quotes used for strings inside the query.
     query_step <- sprintf('.query("%s")', filter_str)
     command <- paste0(command, query_step)
   }
-  
-  # Future enhancements for select, groupby, etc. will go here.
-  
+    
   return(command)
 }
