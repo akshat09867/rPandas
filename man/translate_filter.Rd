@@ -18,5 +18,5 @@ suitable for use with \code{pandas.DataFrame.query()}.
 }
 \examples{
 translate_filter(carat > 2 & cut == "Ideal")
-# -> "carat > 2 and cut == 'Ideal'"
+# -> "(carat > 1) and (cut == 'Ideal')"
 }

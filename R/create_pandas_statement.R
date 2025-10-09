@@ -13,14 +13,7 @@
 #' @param ... Placeholder for future arguments like select, group_by, etc.
 #' @return A character string of the complete, chained pandas command.
 #' @keywords internal
-create_pandas_statement <- function(df_name, filter_str = NULL, ...) {
-  
-  command <- df_name
-  
-  if (!is.null(filter_str) && nchar(filter_str) > 0) {
-    query_step <- sprintf('.query("%s")', filter_str)
-    command <- paste0(command, query_step)
-  }
-    
-  return(command)
+create_pandas_statement <- function(df_name, filter_str) {
+  escaped_filter_str <- gsub("\"", "\\\"", filter_str, fixed = TRUE)
+  sprintf("%s.query(\"%s\")", df_name, escaped_filter_str)
 }

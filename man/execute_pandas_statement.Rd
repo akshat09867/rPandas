@@ -7,23 +7,17 @@
 execute_pandas_statement(r_df, py_command, return.as = "result")
 }
 \arguments{
-\item{r_df}{An R data.frame or data.table to be used in the Python command.}
+\item{r_df}{An R data.frame.}
 
-\item{py_command}{A character string containing the Python code to execute.
-This string should use the placeholder 'df' to refer to the data frame.
-For example: "df.head(5)" or "df.groupby('Species').size()".}
+\item{py_command}{A character string of Python code using 'df' as a placeholder.}
 
-\item{return.as}{A character string specifying what to return.
-- "result": (Default) Returns the resulting R object (e.g., a data frame).
-- "code": Returns the generated Python code string.
-- "all": Returns a list containing both the result and the code.}
+\item{return.as}{What to return: "result", "code", or "all".}
 }
 \value{
-The object specified by the return.as parameter.
+The result of the execution.
 }
 \description{
-This internal function serves as the execution engine for the rPandas package.
-It uses the reticulate package to pass an R data frame to a Python session,
-execute a command on it using pandas, and then retrieve the result back into R.
+This is the core execution engine. It explicitly injects an R data frame
+into the Python session, runs a command, retrieves the result, and cleans up.
 }
 \keyword{internal}

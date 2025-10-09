@@ -4,7 +4,7 @@
 \alias{create_pandas_statement}
 \title{Create a chained pandas command string}
 \usage{
-create_pandas_statement(df_name, filter_str = NULL, ...)
+create_pandas_statement(df_name, filter_str)
 }
 \arguments{
 \item{df_name}{A character string for the name of the pandas DataFrame object

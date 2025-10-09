@@ -1,55 +1,49 @@
 #' Executes a pandas command string on an R data frame.
 #'
-#' @description
-#' This internal function serves as the execution engine for the rPandas package.
-#' It uses the reticulate package to pass an R data frame to a Python session,
-#' execute a command on it using pandas, and then retrieve the result back into R.
+#' This is the core execution engine. It explicitly injects an R data frame
+#' into the Python session, runs a command, retrieves the result, and cleans up.
 #'
-#' @param r_df An R data.frame or data.table to be used in the Python command.
-#' @param py_command A character string containing the Python code to execute.
-#'        This string should use the placeholder 'df' to refer to the data frame.
-#'        For example: "df.head(5)" or "df.groupby('Species').size()".
-#' @param return.as A character string specifying what to return.
-#'        - "result": (Default) Returns the resulting R object (e.g., a data frame).
-#'        - "code": Returns the generated Python code string.
-#'        - "all": Returns a list containing both the result and the code.
-#' @return The object specified by the return.as parameter.
+#' @param r_df An R data.frame.
+#' @param py_command A character string of Python code using 'df' as a placeholder.
+#' @param return.as What to return: "result", "code", or "all".
+#' @return The result of the execution.
 #' @keywords internal
-execute_pandas_statement <- function(r_df, py_command, return.as = "result") {
-  
+execute_pandas_statement <- function(r_df, py_command, return.as = "result") {  
+  rp_check_env() 
   if (!return.as %in% c("result", "code", "all")) {
-    stop("`return.as` must be one of 'result', 'code', or 'all'.", call. = FALSE)
+    stop("`return.as` must be 'result', 'code', or 'all'.", call. = FALSE)
   }
-  
-  py_df_name <- "r.r_df"
+
+  py_df_name <- "rpandas_df_in"
+
+ py[[py_df_name]] <- r_df
+
+
   full_py_command <- gsub("\\bdf\\b", py_df_name, py_command, perl = TRUE)
-  
+
   if (return.as == "code") {
+    reticulate::py_run_string(paste("del", py_df_name))
     return(full_py_command)
   }
-  
 
-  if (!reticulate::py_module_available("pandas")) {
-    stop("The 'pandas' Python module is required. Please install it.", call. = FALSE)
-  }
-  
+
   py_script <- sprintf("
 import pandas as pd
-py_result = %s
+rpandas_df_out = %s
 ", full_py_command)
+
+  reticulate::py_run_string(py_script)
   
-  reticulate::py_run_string(py_script, local = FALSE)
+  reticulate::py_run_string(paste("del", py_df_name))
+
+  result_from_py <- reticulate::py$rpandas_df_out
   
-  result_from_py <- reticulate::py$py_result
-  
+  reticulate::py_run_string("del rpandas_df_out")
+
   if (return.as == "result") {
     return(result_from_py)
   }
-  
   if (return.as == "all") {
-    return(list(
-      result = result_from_py,
-      code = full_py_command
-    ))
+    return(list(result = result_from_py, code = full_py_command))
   }
 }
