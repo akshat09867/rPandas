@@ -2,19 +2,15 @@
 % Please edit documentation in R/utils_setup.R
 \name{rp_check_env}
 \alias{rp_check_env}
-\title{Check for rPandas dependencies}
+\title{Check for rPandas dependencies and provide diagnostics}
 \usage{
 rp_check_env()
 }
 \value{
-Invisibly returns \code{TRUE} if all checks pass, otherwise it stops
-with an informative error message.
+Invisibly returns \code{TRUE} if all checks pass.
 }
 \description{
 This function checks if the user's system is correctly configured with Python
-and the pandas library. It provides helpful messages and instructions if
-dependencies are missing.
-
-All user-facing \code{rPandas} functions will call this function internally to
-ensure the environment is ready.
+and the pandas library. If dependencies are missing, it stops with a
+detailed diagnostic report and actionable instructions.
 }

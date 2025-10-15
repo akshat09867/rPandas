@@ -1,37 +1,44 @@
-#' Check for rPandas dependencies
+#' Check for rPandas dependencies and provide diagnostics
 #'
 #' @description
 #' This function checks if the user's system is correctly configured with Python
-#' and the pandas library. It provides helpful messages and instructions if
-#' dependencies are missing.
-#'
-#' All user-facing `rPandas` functions will call this function internally to
-#' ensure the environment is ready.
+#' and the pandas library. If dependencies are missing, it stops with a
+#' detailed diagnostic report and actionable instructions.
 #'
 #' @export
-#' @return Invisibly returns `TRUE` if all checks pass, otherwise it stops
-#'   with an informative error message.
+#' @return Invisibly returns `TRUE` if all checks pass.
 rp_check_env <- function() {
-    if (!requireNamespace("reticulate", quietly = TRUE)) {
-    stop("Package 'reticulate' is required for this function. Please install it, or call this function only when reticulate is available.", call. = FALSE)
-  }
+
   if (!reticulate::py_available(initialize = TRUE)) {
     stop(
-      "Python could not be found.\n",
-      "Please install Python (e.g., from https://www.python.org/downloads/)\n",
-      "or install a Conda environment (e.g., via reticulate::install_miniconda()).",
+      "Python could not be found by reticulate.\n\n",
+      "--- How to Fix ---\n",
+      "1. Install Python (e.g., from https://www.python.org/downloads/).\n",
+      "2. Or, for a self-contained environment, run this in your R console:\n",
+      '   reticulate::install_miniconda()',
       call. = FALSE
     )
   }
-  
+
   if (!reticulate::py_module_available("pandas")) {
-    stop(
-      "The 'pandas' Python library was not found.\n",
-      "Please install it by running the following command in your R console:\n",
-      'reticulate::py_install("pandas")',
-      call. = FALSE
+    config <- reticulate::py_config()
+    python_path <- config$python
+
+    error_message <- paste0(
+      "The 'pandas' Python library was not found in the current environment.\n\n",
+      "--- rPandas System Diagnosis ---\n",
+      "rPandas is currently configured to use this Python installation:\n",
+      "> ", python_path, "\n\n",
+      "This environment does NOT contain the 'pandas' library.\n\n",
+      "--- How to Fix ---\n",
+      "1. To install pandas into this specific environment, run this in your R console:\n",
+      '   reticulate::py_install("pandas")\n\n',
+      "2. If the path above is incorrect, restart your R session and tell R the correct path *before* loading any libraries:\n",
+      '   reticulate::use_python("/path/to/your/correct/python")\n',
+      "------------------------------"
     )
+    stop(error_message, call. = FALSE)
   }
-  
+
   invisible(TRUE)
 }
