@@ -4,16 +4,25 @@
 \alias{create_pandas_statement}
 \title{Create a chained pandas command string}
 \usage{
-create_pandas_statement(df_name, filter_str)
+create_pandas_statement(
+  df_name,
+  filter_str = NULL,
+  select_str = NULL,
+  sort_by_str = NULL,
+  sort_asc_str = NULL,
+  assing_str = NULL
+)
 }
 \arguments{
-\item{df_name}{A character string for the name of the pandas DataFrame object
-in the Python session (e.g., "py_df").}
+\item{df_name}{A character string for the name of the pandas DataFrame.}
 
-\item{filter_str}{A character string containing a valid pandas query
-(e.g., from \code{translate_filter()}).}
+\item{filter_str}{A string for the \code{.query()} method.}
 
-\item{...}{Placeholder for future arguments like select, group_by, etc.}
+\item{select_str}{A string for column selection (e.g., "\link{'col1', 'col2'}").}
+
+\item{sort_by_str}{A string for the \code{by} argument of \code{.sort_values()}.}
+
+\item{sort_asc_str}{A string for the \code{ascending} argument of \code{.sort_values()}.}
 }
 \value{
 A character string of the complete, chained pandas command.

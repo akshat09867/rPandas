@@ -3,5 +3,8 @@
 export("%notin%")
 export(rp_check_env)
 export(rp_filter)
+export(rp_mutate)
+export(rp_select)
+export(rp_sort)
 export(translate_filter)
 import(reticulate)

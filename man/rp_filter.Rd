@@ -4,7 +4,7 @@
 \alias{rp_filter}
 \title{Filter rows using pandas}
 \usage{
-rp_filter(.data, filter_expression)
+rp_filter(.data, filter_expression, return.as = "result")
 }
 \arguments{
 \item{.data}{An R data.frame or tibble.}
