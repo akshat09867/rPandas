@@ -7,7 +7,7 @@
 #'
 #' @param df_name A character string for the name of the pandas DataFrame.
 #' @param filter_str A string for the `.query()` method.
-#' @param select_str A string for column selection (e.g., "['col1', 'col2']").
+#' @param select_str A string for column selection (e.g., \code{['col1', 'col2']}).
 #' @param sort_by_str A string for the `by` argument of `.sort_values()`.
 #' @param sort_asc_str A string for the `ascending` argument of `.sort_values()`.
 #' @return A character string of the complete, chained pandas command.

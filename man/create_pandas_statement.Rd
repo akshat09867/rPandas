@@ -18,7 +18,7 @@ create_pandas_statement(
 
 \item{filter_str}{A string for the \code{.query()} method.}
 
-\item{select_str}{A string for column selection (e.g., "\link{'col1', 'col2'}").}
+\item{select_str}{A string for column selection (e.g., \code{['col1', 'col2']}).}
 
 \item{sort_by_str}{A string for the \code{by} argument of \code{.sort_values()}.}
 

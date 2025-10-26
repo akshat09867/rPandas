@@ -12,8 +12,8 @@ translate_sort(...)
 \value{
 A list with two elements:
 \itemize{
-\item \verb{$by}: A string for the \code{by} argument (e.g., "\link{'cut', 'price'}")
-\item \verb{$ascending}: A string for the \code{ascending} argument (e.g., "\link{True, False}")
+\item \verb{$by}: A string for the \code{by} argument (e.g., \code{['cut', 'price']})
+\item \verb{$ascending}: A string for the \code{ascending} argument (e.g., \code{[True, False]})
 }
 }
 \description{

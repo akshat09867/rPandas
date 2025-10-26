@@ -20,8 +20,8 @@ translate_select <- function(...) {
 #'
 #' @param ... Bare column names or `desc(colname)` (captured by `rlang::enquos`).
 #' @return A list with two elements:
-#'   - `$by`: A string for the `by` argument (e.g., "['cut', 'price']")
-#'   - `$ascending`: A string for the `ascending` argument (e.g., "[True, False]")
+#'   - `$by`: A string for the `by` argument (e.g., \code{['cut', 'price']})
+#'   - `$ascending`: A string for the `ascending` argument (e.g., \code{[True, False]})
 #' @keywords internal
 translate_sort <- function(...) {
   exprs <- rlang::enquos(...)

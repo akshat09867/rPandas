@@ -4,6 +4,8 @@
 #' Filters a data frame using an R expression translated to pandas.
 #' @param .data An R data.frame or tibble.
 #' @param filter_expression The filtering expression, written in R syntax.
+#' @param return.as A character string specifying what to return: 
+#'   "result" (default), "code", or "all".
 #' @return A `data.frame` containing the filtered rows.
 #' @export
 #' @examples
