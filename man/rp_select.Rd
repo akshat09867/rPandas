@@ -4,12 +4,14 @@
 \alias{rp_select}
 \title{Filtering columns}
 \usage{
-rp_select(.data, ...)
+rp_select(.data, ..., return.as = "result")
 }
 \arguments{
 \item{.data}{An R data.frame or tibble.}
 
 \item{...}{The bare column names to select (e.g., \verb{carat, cut, price}).}
+
+\item{return.as}{What to return: "result", "code", or "all".}
 }
 \value{
 A \code{data.frame} containing only the selected columns.

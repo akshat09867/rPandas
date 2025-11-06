@@ -11,8 +11,7 @@ rp_filter(.data, filter_expression, return.as = "result")
 
 \item{filter_expression}{The filtering expression, written in R syntax.}
 
-\item{return.as}{A character string specifying what to return:
-"result" (default), "code", or "all".}
+\item{return.as}{What to return: "result", "code", or "all".}
 }
 \value{
 A \code{data.frame} containing the filtered rows.

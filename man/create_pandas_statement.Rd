@@ -10,7 +10,9 @@ create_pandas_statement(
   select_str = NULL,
   sort_by_str = NULL,
   sort_asc_str = NULL,
-  assing_str = NULL
+  assing_str = NULL,
+  groupby_str = NULL,
+  agg_str = NULL
 )
 }
 \arguments{
@@ -23,6 +25,10 @@ create_pandas_statement(
 \item{sort_by_str}{A string for the \code{by} argument of \code{.sort_values()}.}
 
 \item{sort_asc_str}{A string for the \code{ascending} argument of \code{.sort_values()}.}
+
+\item{groupby_str}{A string for the \code{.groupby()} method.}
+
+\item{agg_str}{A string for the \code{.agg()} method.}
 }
 \value{
 A character string of the complete, chained pandas command.

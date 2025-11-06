@@ -4,12 +4,14 @@
 \alias{rp_mutate}
 \title{Create or modify columns using pandas}
 \usage{
-rp_mutate(.data, ...)
+rp_mutate(.data, ..., return.as = "result")
 }
 \arguments{
 \item{.data}{An R data.frame or tibble.}
 
 \item{...}{Named R expressions (e.g., \code{price_per_carat = price / carat}).}
+
+\item{return.as}{What to return: "result", "code", or "all".}
 }
 \value{
 A \code{data.frame} with the new or modified columns.

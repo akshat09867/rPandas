@@ -8,41 +8,48 @@
 #' @param return.as What to return: "result", "code", or "all".
 #' @return The result of the execution.
 #' @keywords internal
-execute_pandas_statement <- function(r_df, py_command, return.as = "result") {  
-  rp_check_env() 
+execute_pandas_statement <- function(r_df, py_command, return.as = "result") {
+  rp_check_env()
   if (!return.as %in% c("result", "code", "all")) {
-    stop("`return.as` must be 'result', 'code', or 'all'.", call. = FALSE)
+    stop("return.as must be 'result', 'code', or 'all'.", call. = FALSE)
   }
-
+  
   py_df_name <- "rpandas_df_in"
-
- py[[py_df_name]] <- r_df
-
-
+  py[[py_df_name]] <- r_df
+  
   full_py_command <- gsub("\\bdf\\b", py_df_name, py_command, perl = TRUE)
-
+  
   if (return.as == "code") {
     reticulate::py_run_string(paste("del", py_df_name))
     return(full_py_command)
   }
-
+  
 
   py_script <- sprintf("
 import pandas as pd
+import numpy as np
+
 rpandas_df_out = %s
+
+if isinstance(rpandas_df_out, pd.DataFrame) and isinstance(rpandas_df_out.columns, pd.MultiIndex):
+    rpandas_df_out.columns = ['.'.join(col).strip('.') for col in rpandas_df_out.columns.values]
+
+if isinstance(rpandas_df_out.index, pd.MultiIndex):
+    rpandas_df_out = rpandas_df_out.reset_index()
 ", full_py_command)
 
   reticulate::py_run_string(py_script)
   
   reticulate::py_run_string(paste("del", py_df_name))
-
+  
   result_from_py <- reticulate::py$rpandas_df_out
   
   reticulate::py_run_string("del rpandas_df_out")
-
+  
   if (return.as == "result") {
     return(result_from_py)
   }
+  
   if (return.as == "all") {
     return(list(result = result_from_py, code = full_py_command))
   }

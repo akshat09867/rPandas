@@ -1,5 +1,5 @@
 library(ggplot2)
-print(head(diamonds,1))
+
 #Test 1: AND operator
 result1 <- rp_filter(diamonds, carat > 1 & cut == "Ideal")
 print(head(result1))
@@ -32,8 +32,26 @@ print(head(result6))
 result7 <- rp_select(diamonds,carat,color,cut,x,y,z)
 print(head(result7))
 
-result8 <- rp_sort(diamonds, "carat", desc(table))
+result8 <- rp_sort(diamonds, "carat", desc(table),return.as='code')
 print(head(result8))
 
 result9 <- rp_mutate(diamonds, price_per_carat=price/carat, depth_pct = depth / 100)
 print(head(result9))
+
+result10 <- rp_summarize(
+    ggplot2::diamonds, 
+    avg_price = mean(price), 
+    std_carat = sd(carat),
+    count = n(),
+    .by = c(cut, color)
+  )
+print(head(result10))
+
+result11 <- rp_calculate(
+  ggplot2::diamonds,
+  price, carat,
+  the.functions = c("mean", "sd"),
+  .by = cut
+)
+
+print(head(result11))

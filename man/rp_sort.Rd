@@ -4,13 +4,15 @@
 \alias{rp_sort}
 \title{Sort rows of a data frame using pandas}
 \usage{
-rp_sort(.data, ...)
+rp_sort(.data, ..., return.as = "result")
 }
 \arguments{
 \item{.data}{An R data.frame or tibble.}
 
 \item{...}{Bare column names to sort by. Use \code{desc(colname)} to sort
 in descending order (e.g., \verb{cut, desc(price)}).}
+
+\item{return.as}{What to return: "result", "code", or "all".}
 }
 \value{
 A \code{data.frame} sorted by the specified columns.
