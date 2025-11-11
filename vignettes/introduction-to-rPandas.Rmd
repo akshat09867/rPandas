@@ -1,0 +1,201 @@
+---
+title: "Introduction-to-rPandas"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction-to-rPandas}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+library(rPandas)
+```
+
+
+## Introduction
+rPandas is an R package designed to serve as a translation layer, allowing R users to leverage the power and speed of the Python pandas library without ever leaving their R session.
+
+For R users familiar with dplyr or data.table, the rPandas syntax will feel natural. The package provides a set of R functions (e.g., rp_filter(), rp_select()) that:
+
+Capture R code (like carat > 1).
+
+Translate it into an equivalent Python/pandas command string.
+
+Execute the Python code in the background via the reticulate package.
+
+Return the resulting data.frame back to your R session.
+
+This allows you to write R code while the data processing is handled by Python's pandas library.
+
+## Setup and Installation
+Python Dependencies - 
+rPandas depends on a working Python installation and the pandas library. The reticulate package handles the R-to-Python connection.
+
+You can install pandas into a dedicated R environment by running:
+```{r }
+reticulate::py_install("pandas")
+```
+All rPandas functions include a built-in "health check" to help you diagnose this connection. If you have any issues, the rp_check_env() function can provide a detailed report.
+```{r}
+# Run this if you have connection issues
+rp_check_env()
+```
+
+## The Core Verbs
+All examples will use the diamonds dataset from the ggplot2 package.
+
+```{r}
+# Make sure ggplot2 is installed to access the data
+data(diamonds, package = "ggplot2")
+head(diamonds)
+```
+**1. rp_filter():**
+This verb filters rows based on a logical expression, similar to dplyr::filter().
+
+ ``` {r} 
+# Filter for rows where carat is greater than 1
+v1 <- rp_filter(diamonds, carat > 1)
+print(head(v1))
+
+# Filter with a more complex expression
+v2 <- rp_filter(diamonds, carat > 1 & cut == "Ideal")
+print(head(v2))
+
+# Use %in%
+v3 <- rp_filter(diamonds, color %in% c("E", "F") & price > 18000)
+print(head(v3))
+ ```
+
+**2. rp_select():**
+This verb selects specific columns by name, similar to dplyr::select().
+
+```{r}
+# Select three columns
+v4 <- rp_select(diamonds, carat, cut, price)
+print(head(v4))
+```
+
+**3. rp_sort():**
+This verb sorts the data frame by one or more columns, similar to dplyr::arrange().
+```{r}
+# Sort by price (ascending by default)
+v5 <- rp_sort(diamonds, price)
+print(head(v5))
+
+# Use desc() to sort in descending order
+v6 <- rp_sort(diamonds, desc(price))
+print(head(v6))
+
+# Sort by multiple columns
+v7 <- rp_sort(diamonds, cut, desc(price))
+print(head(v7))
+```
+
+
+**4. rp_mutate():**
+This verb creates new columns or modifies existing ones, similar to dplyr::mutate().
+
+```{r}
+
+# Create a new column
+v8 <- rp_mutate(diamonds, price_per_carat = price / carat)
+print(head(v8))
+
+# Create multiple columns
+v9 <- rp_mutate(
+  diamonds, 
+  price_per_carat = price / carat,
+  depth_pct = depth / 100
+)
+print(head(v9))
+```
+
+
+**5. rp_summarize():**
+This verb collapses a data frame into a summary, often after grouping. It is similar to dplyr::summarise().
+
+```{r}
+
+# Summarize the entire data frame
+v10 <- rp_summarize(diamonds, avg_price = mean(price), max_carat = max(carat))
+print(head(v10))
+
+# Group by one column
+v11 <- rp_summarize(diamonds, avg_price = mean(price), .by = cut)
+print(head(v11))
+
+# Group by multiple columns and get a count
+v12 <- rp_summarize(
+  diamonds, 
+  avg_price = mean(price), 
+  count = n(),
+  .by = c(cut, color)
+)
+print(head(v12))
+```
+
+**6. rp_calculate():**
+This verb is a powerful alternative to rp_summarize, allowing you to apply multiple functions to multiple columns at once.
+
+```{r}
+
+# Apply two functions to two columns, grouped by 'cut'
+v13 <- rp_calculate(
+  diamonds,
+  price, carat,
+  the.functions = c("mean", "sd"),
+  .by = cut
+)
+print(head(v13))
+```
+
+## Chaining Verbs with the Pipe
+All rPandas functions are "pipe-friendly" and use .data as their first argument, allowing you to chain operations together using magrittr's %>% pipe (or the native R |>).
+
+```{r}
+# Load the pipe
+library(magrittr)
+
+v14 <- diamonds %>%
+  rp_filter(carat > 1 & color == "D") %>%
+  rp_mutate(price_per_carat = price / carat) %>%
+  rp_summarize(avg_ppc = mean(price_per_carat), .by = cut) %>%
+  rp_sort(desc(avg_ppc))
+
+print(head(v14))
+```
+
+## Viewing the Python Code
+A key feature of rPandas is its role as a learning and translation tool. Every user-facing verb has a return.as argument that lets you inspect the Python code it generates.
+
+You can set return.as to:
+
+**"result" (default):** Returns the final R data frame.
+
+**"code":** Returns the generated Python command as a string.
+
+**"all":** Returns a list containing both the result and the code.
+
+```{r}
+# See the code for a simple filter
+rp_filter(diamonds, carat > 1 & price < 400, return.as = "code")
+
+# See the code for a mutate
+rp_mutate(diamonds, ppc = price / carat, return.as = "code")
+
+# See the code for a complex summary
+rp_summarize(
+  diamonds, 
+  avg_price = mean(price), 
+  count = n(),
+  .by = c(cut, color),
+  return.as = "code"
+)
+```

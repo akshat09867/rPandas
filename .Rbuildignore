@@ -1,3 +1,5 @@
 ^LICENSE\.md$
 ^\.github$
 ^dev$
+^doc$
+^Meta$
