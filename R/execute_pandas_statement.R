@@ -14,6 +14,8 @@ execute_pandas_statement <- function(r_df, py_command, return.as = "result") {
     stop("return.as must be 'result', 'code', or 'all'.", call. = FALSE)
   }
   
+  reticulate::py_run_string("import pandas as pd")
+  
   py_df_name <- "rpandas_df_in"
   py[[py_df_name]] <- r_df
   
@@ -24,7 +26,6 @@ execute_pandas_statement <- function(r_df, py_command, return.as = "result") {
     return(full_py_command)
   }
   
-
   py_script <- sprintf("
 import pandas as pd
 import numpy as np
@@ -39,18 +40,27 @@ if isinstance(rpandas_df_out.index, pd.MultiIndex):
 ", full_py_command)
 
   reticulate::py_run_string(py_script)
-  
   reticulate::py_run_string(paste("del", py_df_name))
   
   result_from_py <- reticulate::py$rpandas_df_out
   
+  result_in_r <- tryCatch(
+    reticulate::py_to_r(result_from_py),
+    error = function(e) result_from_py  
+  )
+  
+  if (inherits(result_in_r, "python.builtin.object")) {
+    reticulate::py_run_string("rpandas_dict = rpandas_df_out.to_dict(orient='list')")
+    dict_from_py <- reticulate::py$rpandas_dict
+    result_in_r <- as.data.frame(dict_from_py, stringsAsFactors = FALSE)
+    reticulate::py_run_string("del rpandas_dict")
+  }
+  
   reticulate::py_run_string("del rpandas_df_out")
   
   if (return.as == "result") {
-    return(result_from_py)
+    return(result_in_r)
   }
   
-  if (return.as == "all") {
-    return(list(result = result_from_py, code = full_py_command))
-  }
+  list(result = result_in_r, code = full_py_command)
 }

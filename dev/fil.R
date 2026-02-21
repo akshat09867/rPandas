@@ -1,7 +1,7 @@
 library(ggplot2)
 
 #Test 1: AND operator
-result1 <- rp_filter(diamonds, carat > 1 & cut == "Ideal")
+result1 <- rp_filter(diamonds, carat > 1 & cut == "Ideal", return.as = "code")
 print(head(result1))
 
 # Test 2: OR operator
