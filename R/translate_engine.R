@@ -159,35 +159,46 @@ translate_sort <- function(...) {
   return(list(by = by_str, ascending = asc_str))
 }
 
-#' Translate named R expressions for .assign()
+#' Translate R mutate expressions to pandas assign/drop strings
 #'
-#' @description
-#' Captures one or more named R expressions and translates them into a
-#' single, comma-separated string of keyword arguments for pandas `.assign()`.
-#'
-#' @param ... Named R expressions (e.g., `new_col = old_col * 2`).
-#' @return A single string (e.g., "new_col = (old_col * 2), other = 'value'").
+#' @param to_remove Character vector of column names to drop.
+#' @param ... Named R expressions.
+#' @return A list with components assign_str and drop_str.
 #' @keywords internal
-translate_mutate <- function(...) {
+translate_mutate <- function(to_remove = NULL, ...) {
   exprs <- rlang::enquos(...)
-  
-  if (rlang::is_empty(exprs)) {
-    return(NULL)
+    if (length(exprs) > 0) {
+    nm <- names(exprs)
+    if (is.null(nm) || any(nm == "")) {
+      stop("All arguments to rp_mutate() must be named (e.g., new_col = expression).",
+           call. = FALSE)
+    }
   }
-  if (is.null(names(exprs)) || any(names(exprs) == "")) {
-    stop("All arguments to rp_mutate() must be named.", call. = FALSE)
+  
+  assign_pieces <- character()
+  if (length(exprs) > 0) {
+   assign_pieces <- vapply(seq_along(exprs), function(i) {
+      q <- exprs[[i]]
+      col_name <- names(exprs)[i]          # Get the argument name
+      translated <- translate_assign_recursive(rlang::get_expr(q))
+      paste0(col_name, " = lambda x: ", translated)
+    }, FUN.VALUE = character(1))
   }
   
-  new_col_names <- names(exprs)
+  drop_str <- NULL
+  if (length(to_remove) > 0) {
+    if (!is.character(to_remove)) {
+      stop("`to_remove` must be a character vector of column names.", call. = FALSE)
+    }
+    quoted <- paste0('"', to_remove, '"')
+    drop_str <- sprintf(".drop(columns = [%s])", paste(quoted, collapse = ", "))
+  }
   
-  translated_exprs <- vapply(exprs, function(expr) {
-    translate_assign_recursive(rlang::get_expr(expr))
-  }, FUN.VALUE = character(1))
-
-  assign_pieces <- paste0(new_col_names, " = lambda x: ", translated_exprs)
-  return(paste(assign_pieces, collapse = ", "))
+  list(
+    assign_str = paste(assign_pieces, collapse = ", "),
+    drop_str = drop_str
+  )
 }
-
 
 #' Recursively translate an R expression for a pandas .assign() lambda
 #'
@@ -227,7 +238,7 @@ translate_assign_recursive <- function(expr_body) {
     py_op <- switch(op,
                     "%/%" = "//",
                     "%%"  = "%",
-                    op) 
+                    op)
     
     if (py_op %in% c("==", "!=", ">", ">=", "<", "<=", "+", "-", "*", "/", "//", "%")) {
       return(paste0("(", tr(args[[1]]), " ", py_op, " ", tr(args[[2]]), ")"))

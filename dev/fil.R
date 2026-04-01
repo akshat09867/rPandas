@@ -1,6 +1,6 @@
 library(ggplot2)
 
-#Test 1: AND operator
+# Test 1: AND operator
 result1 <- rp_filter(diamonds, carat > 1 & cut == "Ideal", return.as = "code")
 print(head(result1))
 
@@ -55,3 +55,24 @@ result11 <- rp_calculate(
 )
 
 print(head(result11))
+
+result12 <- rp_first_k_rows(
+  ggplot2::diamonds,
+  1,
+ .by = c(cut, color)
+  )
+
+print(result12)
+
+result13 <- rp_last_k_rows(
+  ggplot2::diamonds,
+  7,
+ .by = c(cut, color)
+  )
+
+print(result13)
+
+result14 <- rp_mutate(ggplot2::diamonds, 
+                    to_remove = c("cut","price"),
+                    price_per_carat = price / carat)
+print(head(result14))

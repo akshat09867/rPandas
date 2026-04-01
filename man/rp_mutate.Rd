@@ -2,21 +2,22 @@
 % Please edit documentation in R/verbs_filter.R
 \name{rp_mutate}
 \alias{rp_mutate}
-\title{Create or modify columns using pandas}
+\title{Mutate (add/modify/remove) columns using pandas}
 \usage{
-rp_mutate(.data, ..., return.as = "result")
+rp_mutate(.data, to_remove = NULL, ..., return.as = "result")
 }
 \arguments{
-\item{.data}{An R data.frame or tibble.}
+\item{.data}{An R data frame.}
 
-\item{...}{Named R expressions (e.g., \code{price_per_carat = price / carat}).}
+\item{to_remove}{A character vector of column names to remove.}
 
-\item{return.as}{What to return: "result", "code", or "all".}
+\item{...}{Named expressions for new/modified columns.}
+
+\item{return.as}{Either "result", "code", or "all".}
 }
 \value{
-A \code{data.frame} with the new or modified columns.
+A data frame or list depending on return.as.
 }
 \description{
-Creates new columns or modifies existing ones by translating R expressions
-into a pandas \code{.assign()} command.
+Mutate (add/modify/remove) columns using pandas
 }

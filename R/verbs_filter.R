@@ -85,30 +85,26 @@ rp_sort <- function(.data, ...,return.as='result') {
 }
 
 
-#' Create or modify columns using pandas
+#' Mutate (add/modify/remove) columns using pandas
 #'
-#' @description
-#' Creates new columns or modifies existing ones by translating R expressions
-#' into a pandas `.assign()` command.
-#'
-#' @param .data An R data.frame or tibble.
-#' @param ... Named R expressions (e.g., `price_per_carat = price / carat`).
-#' @param return.as What to return: "result", "code", or "all".
-#' @return A `data.frame` with the new or modified columns.
+#' @param .data An R data frame.
+#' @param to_remove A character vector of column names to remove.
+#' @param ... Named expressions for new/modified columns.
+#' @param return.as Either "result", "code", or "all".
+#' @return A data frame or list depending on return.as.
 #' @export
-rp_mutate <- function(.data, ...,return.as='result') {
+rp_mutate <- function(.data, to_remove = NULL, ..., return.as = "result") {
   rp_check_env()
   
-  assign_str <- translate_mutate(...)
-  
-  command_str <- create_pandas_statement(
-    "df", 
-    assing_str = assign_str
+  trans <- translate_mutate(to_remove, ...)
+    command_str <- create_pandas_statement(
+    df_name = "df",
+    assign_str = if (nzchar(trans$assign_str)) trans$assign_str else NULL,
+    drop_str = trans$drop_str
   )
   
-  execute_pandas_statement(r_df = .data, py_command = command_str,return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, return.as = return.as)
 }
-
 
 #' Summarize data using pandas
 #'
@@ -205,5 +201,48 @@ rp_calculate <- function(.data, ..., the.functions, .by = NULL,return.as='result
     agg_str = agg_str
   )
   
-  execute_pandas_statement(r_df = .data, py_command = command_str,return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, return.as)
+}
+
+
+#' Extract the first k rows of a data frame
+#'
+#' This function returns the first k rows of the data frame. If grouping variables
+#' are provided via `.by`, it returns the first k rows within each group.
+#'
+#' @param .data An R data frame (or tibble) to be processed.
+#' @param k An integer specifying the number of rows to return. If `.by` is used,
+#'   returns up to k rows per group.
+#' @param .by Optional grouping variables. Can be one or more unquoted column names.
+#'   When provided, the operation is performed on each group separately.
+#' @param return.as One of `"result"`, `"code"`, or `"all"`.
+#' @return Depending on `return.as`: a data frame, a character string, or a list.
+#' @export
+rp_first_k_rows <- function(.data, k, .by=NULL, return.as= "result"){
+    groupby_str <- translate_groupby(rlang::enquo(.by))
+    f_expr <- create_pandas_statement("df", groupby_str = groupby_str, head_k = k)
+  execute_pandas_statement(r_df = .data, py_command = f_expr, return.as)
+}
+
+
+#' Extract the last k rows of a data frame
+#'
+#' This function returns the last k rows of the data frame. If grouping variables
+#' are provided via `.by`, it returns the last k rows within each group.
+#'
+#' @param .data An R data frame (or tibble) to be processed.
+#' @param k An integer specifying the number of rows to return. If `.by` is used,
+#'   returns up to k rows per group.
+#' @param .by Optional grouping variables. Can be one or more unquoted column names.
+#'   When provided, the operation is performed on each group separately.
+#' @param return.as One of `"result"`, `"code"`, or `"all"`. Determines the output:
+#'   * `"result"` returns the resulting data frame.
+#'   * `"code"` returns the generated Python code as a character string.
+#'   * `"all"` returns a list containing both the result and the code.
+#' @return Depending on `return.as`: a data frame, a character string, or a list.
+#' @export
+rp_last_k_rows <- function(.data, k, .by=NULL, return.as="result"){
+  groupby_str <- translate_groupby(rlang::enquo(.by))
+  f_expr <- create_pandas_statement("df", groupby_str = groupby_str, tail_k = k)
+  execute_pandas_statement(r_df = .data, py_command = f_expr, return.as)
 }

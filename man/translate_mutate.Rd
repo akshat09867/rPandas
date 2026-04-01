@@ -2,18 +2,19 @@
 % Please edit documentation in R/translate_engine.R
 \name{translate_mutate}
 \alias{translate_mutate}
-\title{Translate named R expressions for .assign()}
+\title{Translate R mutate expressions to pandas assign/drop strings}
 \usage{
-translate_mutate(...)
+translate_mutate(to_remove = NULL, ...)
 }
 \arguments{
-\item{...}{Named R expressions (e.g., \code{new_col = old_col * 2}).}
+\item{to_remove}{Character vector of column names to drop.}
+
+\item{...}{Named R expressions.}
 }
 \value{
-A single string (e.g., "new_col = (old_col * 2), other = 'value'").
+A list with components assign_str and drop_str.
 }
 \description{
-Captures one or more named R expressions and translates them into a
-single, comma-separated string of keyword arguments for pandas \code{.assign()}.
+Translate R mutate expressions to pandas assign/drop strings
 }
 \keyword{internal}

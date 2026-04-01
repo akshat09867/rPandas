@@ -10,9 +10,12 @@ create_pandas_statement(
   select_str = NULL,
   sort_by_str = NULL,
   sort_asc_str = NULL,
-  assing_str = NULL,
+  assign_str = NULL,
+  drop_str = NULL,
   groupby_str = NULL,
-  agg_str = NULL
+  agg_str = NULL,
+  head_k = NULL,
+  tail_k = NULL
 )
 }
 \arguments{
@@ -26,9 +29,17 @@ create_pandas_statement(
 
 \item{sort_asc_str}{A string for the \code{ascending} argument of \code{.sort_values()}.}
 
+\item{assign_str}{A string for the \code{.assign()} method.}
+
+\item{drop_str}{A string for the \code{.drop()} method.}
+
 \item{groupby_str}{A string for the \code{.groupby()} method.}
 
 \item{agg_str}{A string for the \code{.agg()} method.}
+
+\item{head_k}{Integer for \code{.head(k)}.}
+
+\item{tail_k}{Integer for \code{.tail(k)}.}
 }
 \value{
 A character string of the complete, chained pandas command.
