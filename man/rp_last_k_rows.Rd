@@ -15,12 +15,7 @@ returns up to k rows per group.}
 \item{.by}{Optional grouping variables. Can be one or more unquoted column names.
 When provided, the operation is performed on each group separately.}
 
-\item{return.as}{One of \code{"result"}, \code{"code"}, or \code{"all"}. Determines the output:
-\itemize{
-\item \code{"result"} returns the resulting data frame.
-\item \code{"code"} returns the generated Python code as a character string.
-\item \code{"all"} returns a list containing both the result and the code.
-}}
+\item{return.as}{One of \code{"result"}, \code{"code"}, or \code{"all"}.}
 }
 \value{
 Depending on \code{return.as}: a data frame, a character string, or a list.

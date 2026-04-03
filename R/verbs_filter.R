@@ -235,14 +235,38 @@ rp_first_k_rows <- function(.data, k, .by=NULL, return.as= "result"){
 #'   returns up to k rows per group.
 #' @param .by Optional grouping variables. Can be one or more unquoted column names.
 #'   When provided, the operation is performed on each group separately.
-#' @param return.as One of `"result"`, `"code"`, or `"all"`. Determines the output:
-#'   * `"result"` returns the resulting data frame.
-#'   * `"code"` returns the generated Python code as a character string.
-#'   * `"all"` returns a list containing both the result and the code.
+#' @param return.as One of `"result"`, `"code"`, or `"all"`.
 #' @return Depending on `return.as`: a data frame, a character string, or a list.
 #' @export
 rp_last_k_rows <- function(.data, k, .by=NULL, return.as="result"){
   groupby_str <- translate_groupby(rlang::enquo(.by))
   f_expr <- create_pandas_statement("df", groupby_str = groupby_str, tail_k = k)
   execute_pandas_statement(r_df = .data, py_command = f_expr, return.as)
+}
+
+#' Count rows in a data frame, optionally by groups
+#'
+#' This function returns the number of rows in a data frame. When grouping
+#' variables are provided via `.by`, it returns the row counts for each group.
+#'
+#' @param .data An R data frame (or tibble) to be processed.
+#' @param .by Optional grouping variables. Can be one or more unquoted column names
+#'   (e.g., `cut` or `c(cut, color)`). When provided, counts are computed per group.
+#' @param return.as One of `"result"`, `"code"`, or `"all"`.
+#' @return A data frame with one column `"n"` (total row count) if `.by = NULL`,
+#'     or a data frame with the grouping columns and a column `"n"` (per‑group counts).
+#' @export
+rp_count <- function(.data, .by = NULL, return.as = "result"){
+  by_quo <- rlang::enquo(.by)
+  
+  if (rlang::quo_is_missing(by_quo) || rlang::quo_is_null(by_quo)) {
+    py_cmd <- "pd.DataFrame({'n': [len(df)]})"
+    
+  } else {
+   by_expr <- rlang::quo_get_expr(by_quo)
+        groupby_str <- translate_groupby(by_expr)
+        py_cmd <- paste0("df", groupby_str, ".size().rename(columns={'size': 'n'})")
+  }
+  
+  execute_pandas_statement(r_df = .data, py_command = py_cmd, return.as = return.as)
 }

@@ -76,3 +76,13 @@ result14 <- rp_mutate(ggplot2::diamonds,
                     to_remove = c("cut","price"),
                     price_per_carat = price / carat)
 print(head(result14))
+
+result15 <- rp_count(ggplot2::diamonds, .by = c(cut, color))
+print(result15)
+
+
+result16 <- diamonds %>%
+  rp_filter(price > 15000) %>%
+  rp_count(.by = cut)
+
+  print(result16)

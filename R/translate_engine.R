@@ -282,8 +282,6 @@ translate_groupby <- function(by_expr) {
 }
 
 
-
-
 #' Translate named R expressions for .agg()
 #'
 #' @description

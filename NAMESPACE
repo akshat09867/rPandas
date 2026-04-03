@@ -3,6 +3,7 @@
 export("%notin%")
 export(rp_calculate)
 export(rp_check_env)
+export(rp_count)
 export(rp_filter)
 export(rp_first_k_rows)
 export(rp_last_k_rows)
