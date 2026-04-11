@@ -20,9 +20,9 @@
 #' @keywords internal
 create_pandas_statement <- function(df_name, filter_str= NULL, select_str= NULL, sort_by_str=NULL,sort_asc_str=NULL, assign_str=NULL,drop_str=NULL,groupby_str = NULL, agg_str = NULL, head_k=NULL, tail_k=NULL) {
   command <- df_name
-  escaped_filter_str <- gsub("\"", "\\\"", filter_str, fixed = TRUE)
+  escaped_filter_str <- gsub("'", "\\\"", filter_str, fixed = TRUE)
   if (!is.null(filter_str) && nchar(filter_str) > 0) {
-  command <- sprintf("%s.query(\"%s\")", command, escaped_filter_str)
+  command <- sprintf("%s.query('%s')", command, escaped_filter_str)
   }
   if(!is.null(select_str) && nchar(select_str)>0){
     command <- paste0(command, sprintf("[%s]",select_str))

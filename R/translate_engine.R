@@ -179,7 +179,7 @@ translate_mutate <- function(to_remove = NULL, ...) {
   if (length(exprs) > 0) {
    assign_pieces <- vapply(seq_along(exprs), function(i) {
       q <- exprs[[i]]
-      col_name <- names(exprs)[i]          # Get the argument name
+      col_name <- names(exprs)[i]
       translated <- translate_assign_recursive(rlang::get_expr(q))
       paste0(col_name, " = lambda x: ", translated)
     }, FUN.VALUE = character(1))
@@ -227,7 +227,10 @@ translate_assign_recursive <- function(expr_body) {
     args <- as.list(expr_body)[-1]
     
     tr <- function(x) translate_assign_recursive(x)
-
+  if (op == "(") {
+      return(tr(args[[1]]))
+    }
+    
     
     if (op %in% c("&", "&&")) return(paste0("(", tr(args[[1]]), " and ", tr(args[[2]]), ")"))
     if (op %in% c("|", "||")) return(paste0("(", tr(args[[1]]), " or ", tr(args[[2]]), ")"))
@@ -245,6 +248,9 @@ translate_assign_recursive <- function(expr_body) {
     }
 
     translated_args <- vapply(args, tr, character(1))
+    if (grepl("^\\((.*)\\)$", translated_args)) {
+  translated_args <- gsub("^\\((.*)\\)$", "\\1", translated_args)
+}
     return(paste0(op, "(", paste(translated_args, collapse = ", "), ")"))
   }
 
@@ -262,23 +268,22 @@ translate_assign_recursive <- function(expr_body) {
 #' @keywords internal
 translate_groupby <- function(by_expr) {
   expr_body <- rlang::get_expr(by_expr)
-  
-  if (rlang::is_null(expr_body)) {
-    return(NULL)
-  }
+  if (rlang::is_null(expr_body)) return(NULL)
   
   col_names <- character()
-  
   if (is.call(expr_body) && rlang::call_name(expr_body) == "c") {
     args <- rlang::call_args(expr_body)
-    col_names <- vapply(args, rlang::expr_text, character(1))
+    col_names <- vapply(args, function(arg) {
+      txt <- rlang::expr_text(arg)
+      gsub('^"|"$', '', txt)
+    }, character(1))
   } else {
-    col_names <- rlang::expr_text(expr_body)
+    txt <- rlang::expr_text(expr_body)
+    col_names <- gsub('^"|"$', '', txt)
   }
   
   py_list_str <- sprintf("['%s']", paste(col_names, collapse = "', '"))
-  
-  sprintf(".groupby(%s, as_index=False)", py_list_str)
+  sprintf(".groupby(%s, as_index=False, observed=True)", py_list_str)
 }
 
 

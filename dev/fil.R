@@ -35,7 +35,7 @@ print(head(result7))
 result8 <- rp_sort(diamonds, "carat", desc(table),return.as='code')
 print(head(result8))
 
-result9 <- rp_mutate(diamonds, price_per_carat=price/carat, depth_pct = depth / 100)
+result9 <- rp_mutate(diamonds, price_per_carat=price/carat, depth_pct = depth / 100, )
 print(head(result9))
 
 result10 <- rp_summarize(
@@ -59,7 +59,7 @@ print(head(result11))
 result12 <- rp_first_k_rows(
   ggplot2::diamonds,
   1,
- .by = c(cut, color)
+ .by = c(cut, clarity)
   )
 
 print(result12)
@@ -78,7 +78,8 @@ result14 <- rp_mutate(ggplot2::diamonds,
 print(head(result14))
 
 result15 <- rp_count(ggplot2::diamonds, .by = c(cut, color))
-print(result15)
+print("rp_count------------------")
+print(head(result15))
 
 
 result16 <- diamonds %>%
@@ -86,3 +87,30 @@ result16 <- diamonds %>%
   rp_count(.by = cut)
 
   print(result16)
+
+
+
+result12 <- rp_first_k_rows(
+  ggplot2::diamonds,
+  3,
+ .by = c(cut, clarity)
+  )
+
+print(result12)
+
+
+
+# print(head(rp_filter(.data = diamonds, filter_expression = price >= 18500, return.as = "code")))
+# print(head(rp_select(.data = diamonds, price, carat, return.as = "all")))
+# print(head(rp_mutate(.data = diamonds, expensive = (price >= 1000), return.as = "code")))
+# print(head(diamonds <- rp_mutate(.data = diamonds, expensive = price >= 1000)))
+# print(head(rp_first_k_rows(.data = diamonds, .by = cut, k = 3)))
+# print(head(rp_first_k_rows(.data = diamonds, .by = "cut", k = 3, return.as = "code")))
+# print(head(rp_last_k_rows(.data = diamonds, k = 3, .by = c("cut", "clarity"))))
+# print(head(rp_last_k_rows(.data = diamonds, k = 3)))
+# print(head(rp_count(.data = diamonds, .by = cut, return.as = "result")))
+# print(head(rp_calculate(.data = diamonds, x, y, z, price, .by = cut, the.functions = c("mean", "median", "sd"))))
+
+
+
+

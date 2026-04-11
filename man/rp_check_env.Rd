@@ -12,5 +12,6 @@ Invisibly returns \code{TRUE} if all checks pass.
 \description{
 This function checks if the user's system is correctly configured with Python
 and the pandas library. If dependencies are missing, it stops with a
-detailed diagnostic report and actionable instructions.
+detailed diagnostic report and actionable instructions, including listing
+available conda environments if applicable.
 }
