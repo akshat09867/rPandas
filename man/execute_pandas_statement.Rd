@@ -4,12 +4,19 @@
 \alias{execute_pandas_statement}
 \title{Executes a pandas command string on an R data frame.}
 \usage{
-execute_pandas_statement(r_df, py_command, return.as = "result")
+execute_pandas_statement(
+  r_df,
+  py_command,
+  table_name = table_name,
+  return.as = "result"
+)
 }
 \arguments{
 \item{r_df}{An R data.frame.}
 
 \item{py_command}{A character string of Python code using 'df' as a placeholder.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{What to return: "result", "code", or "all".}
 }

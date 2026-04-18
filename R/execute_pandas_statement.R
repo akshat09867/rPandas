@@ -5,10 +5,11 @@
 #'
 #' @param r_df An R data.frame.
 #' @param py_command A character string of Python code using 'df' as a placeholder.
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @param return.as What to return: "result", "code", or "all".
 #' @return The result of the execution.
 #' @keywords internal
-execute_pandas_statement <- function(r_df, py_command, return.as = "result") {
+execute_pandas_statement <- function(r_df, py_command, table_name = table_name, return.as = "result") {
   rp_check_env()
   if (!return.as %in% c("result", "code", "all")) {
     stop("return.as must be 'result', 'code', or 'all'.", call. = FALSE)
@@ -20,10 +21,15 @@ execute_pandas_statement <- function(r_df, py_command, return.as = "result") {
   py[[py_df_name]] <- r_df
   
   full_py_command <- gsub("\\bdf\\b", py_df_name, py_command, perl = TRUE)
-  
+    display_code <- full_py_command
+  if (!is.null(table_name) && is.character(table_name)) {
+    display_code <- gsub("rpandas_df_in", table_name, display_code, fixed = TRUE)
+  } else {
+    display_code <- gsub("rpandas_df_in", "df", display_code, fixed = TRUE)
+  }
   if (return.as == "code") {
     reticulate::py_run_string(paste("del", py_df_name))
-    return(full_py_command)
+    return(display_code)
   }
   
   py_script <- sprintf("
@@ -62,5 +68,5 @@ if isinstance(rpandas_df_out.index, pd.MultiIndex):
     return(result_in_r)
   }
   
-  list(result = result_in_r, code = full_py_command)
+  list(result = result_in_r, code = display_code)
 }

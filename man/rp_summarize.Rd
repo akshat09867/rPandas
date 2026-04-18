@@ -4,7 +4,7 @@
 \alias{rp_summarize}
 \title{Summarize data using pandas}
 \usage{
-rp_summarize(.data, ..., .by = NULL, return.as = "result")
+rp_summarize(.data, ..., .by = NULL, table_name = NULL, return.as = "result")
 }
 \arguments{
 \item{.data}{An R data.frame or tibble.}
@@ -13,6 +13,8 @@ rp_summarize(.data, ..., .by = NULL, return.as = "result")
 Supports \code{mean}, \code{median}, \code{sd}, \code{var}, \code{min}, \code{max}, \code{sum}, and \code{n()}.}
 
 \item{.by}{A bare column name or \code{c(col1, col2)} to group by.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{What to return: "result", "code", or "all".}
 }

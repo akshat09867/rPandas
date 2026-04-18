@@ -4,6 +4,7 @@
 #' Filters a data frame using an R expression translated to pandas.
 #' @param .data An R data.frame or tibble.
 #' @param filter_expression The filtering expression, written in R syntax.
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @param return.as What to return: "result", "code", or "all".
 #' @return A `data.frame` containing the filtered rows.
 #' @export
@@ -15,15 +16,14 @@
 #'   rp_filter(ggplot2::diamonds, carat > 1 & price < 4000)
 #' }
 
-rp_filter <- function(.data, filter_expression, return.as = "result") {
+rp_filter <- function(.data, filter_expression, table_name = NULL,return.as = "result") {
   filter_expr <- substitute(filter_expression)
 
   filter_str <- translate_filter(!!filter_expr)
-  print(filter_str)
   command_str <- create_pandas_statement("df", filter_str = filter_str)
   
 
-  execute_pandas_statement(r_df = .data, py_command = command_str, return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, table_name = table_name,return.as)
 }
 
 #'Filtering columns
@@ -33,6 +33,7 @@ rp_filter <- function(.data, filter_expression, return.as = "result") {
 #'
 #' @param .data An R data.frame or tibble.
 #' @param ... The bare column names to select (e.g., `carat, cut, price`).
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @param return.as What to return: "result", "code", or "all".
 #' @return A `data.frame` containing only the selected columns.
 #'
@@ -42,11 +43,11 @@ rp_filter <- function(.data, filter_expression, return.as = "result") {
 #'     reticulate::py_module_available("pandas")) {
 #'   rp_select(ggplot2::diamonds, carat, cut, price)
 #' }
-rp_select <- function(.data, ..., return.as='result'){
+rp_select <- function(.data, ..., table_name=NULL,return.as='result'){
   rp_check_env()
  select_c <- translate_select(...)
  command <- create_pandas_statement("df", select_str= select_c)
- execute_pandas_statement(.data, command,return.as)
+ execute_pandas_statement(.data, command, table_name = table_name,return.as)
 }
 
 
@@ -60,6 +61,7 @@ rp_select <- function(.data, ..., return.as='result'){
 #' @param ... Bare column names to sort by. Use `desc(colname)` to sort
 #'   in descending order (e.g., `cut, desc(price)`).
 #' @param return.as What to return: "result", "code", or "all".
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return A `data.frame` sorted by the specified columns.
 #'
 #' @export
@@ -70,7 +72,7 @@ rp_select <- function(.data, ..., return.as='result'){
 #'   # Sort by cut (ascending) and price (descending)
 #'   rp_sort(ggplot2::diamonds, cut, desc(price))
 #' }
-rp_sort <- function(.data, ...,return.as='result') {
+rp_sort <- function(.data, ...,table_name=NULL,return.as='result') {
   rp_check_env()
   
   sort_params <- translate_sort(...)
@@ -81,7 +83,7 @@ rp_sort <- function(.data, ...,return.as='result') {
     sort_asc_str = sort_params$ascending
   )
   
-  execute_pandas_statement(r_df = .data, py_command = command_str,return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, table_name = table_name,return.as)
 }
 
 
@@ -91,9 +93,10 @@ rp_sort <- function(.data, ...,return.as='result') {
 #' @param to_remove A character vector of column names to remove.
 #' @param ... Named expressions for new/modified columns.
 #' @param return.as Either "result", "code", or "all".
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return A data frame or list depending on return.as.
 #' @export
-rp_mutate <- function(.data, to_remove = NULL, ..., return.as = "result") {
+rp_mutate <- function(.data, to_remove = NULL, ...,table_name=NULL, return.as = "result") {
   rp_check_env()
   
   trans <- translate_mutate(to_remove, ...)
@@ -103,7 +106,7 @@ rp_mutate <- function(.data, to_remove = NULL, ..., return.as = "result") {
     drop_str = trans$drop_str
   )
   
-  execute_pandas_statement(r_df = .data, py_command = command_str, return.as = return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, table_name = table_name, return.as = return.as)
 }
 
 #' Summarize data using pandas
@@ -118,6 +121,7 @@ rp_mutate <- function(.data, to_remove = NULL, ..., return.as = "result") {
 #'   Supports `mean`, `median`, `sd`, `var`, `min`, `max`, `sum`, and `n()`.
 #' @param .by A bare column name or `c(col1, col2)` to group by.
 #' @param return.as What to return: "result", "code", or "all".
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return A `data.frame` with the summarized and grouped data.
 #'
 #' @export
@@ -136,7 +140,7 @@ rp_mutate <- function(.data, to_remove = NULL, ..., return.as = "result") {
 #'                count = n(),
 #'                .by = c(cut, color))
 #' }
-rp_summarize <- function(.data, ..., .by = NULL,return.as='result') {
+rp_summarize <- function(.data, ..., .by = NULL,table_name=NULL,return.as='result') {
   rp_check_env()
   
   groupby_str <- translate_groupby(rlang::enquo(.by))
@@ -149,7 +153,7 @@ rp_summarize <- function(.data, ..., .by = NULL,return.as='result') {
     agg_str = agg_str
   )
   
-  execute_pandas_statement(r_df = .data, py_command = command_str,return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, table_name = table_name,return.as)
 }
 
 
@@ -167,6 +171,7 @@ rp_summarize <- function(.data, ..., .by = NULL,return.as='result') {
 #'   "var", "min", "max", "sum".
 #' @param .by A bare column name or `c(col1, col2)` to group by.
 #' @param return.as What to return: "result", "code", or "all".
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return A `data.frame` with the summarized and grouped data.
 #' @export
 #' @examples
@@ -180,7 +185,7 @@ rp_summarize <- function(.data, ..., .by = NULL,return.as='result') {
 #'     .by = cut
 #'   )
 #' }
-rp_calculate <- function(.data, ..., the.functions, .by = NULL,return.as='result') {
+rp_calculate <- function(.data, ..., the.functions, .by = NULL,table_name=NULL,return.as='result') {
   rp_check_env()
   
   groupby_str <- translate_groupby(rlang::enquo(.by))
@@ -201,7 +206,7 @@ rp_calculate <- function(.data, ..., the.functions, .by = NULL,return.as='result
     agg_str = agg_str
   )
   
-  execute_pandas_statement(r_df = .data, py_command = command_str, return.as)
+  execute_pandas_statement(r_df = .data, py_command = command_str, table_name = table_name, return.as)
 }
 
 
@@ -216,12 +221,13 @@ rp_calculate <- function(.data, ..., the.functions, .by = NULL,return.as='result
 #' @param .by Optional grouping variables. Can be one or more unquoted column names.
 #'   When provided, the operation is performed on each group separately.
 #' @param return.as One of `"result"`, `"code"`, or `"all"`.
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return Depending on `return.as`: a data frame, a character string, or a list.
 #' @export
-rp_first_k_rows <- function(.data, k, .by=NULL, return.as= "result"){
+rp_first_k_rows <- function(.data, k, .by=NULL,table_name=NULL, return.as= "result"){
     groupby_str <- translate_groupby(rlang::enquo(.by))
     f_expr <- create_pandas_statement("df", groupby_str = groupby_str, head_k = k)
-  execute_pandas_statement(r_df = .data, py_command = f_expr, return.as)
+  execute_pandas_statement(r_df = .data, py_command = f_expr, table_name = table_name, return.as)
 }
 
 
@@ -236,12 +242,13 @@ rp_first_k_rows <- function(.data, k, .by=NULL, return.as= "result"){
 #' @param .by Optional grouping variables. Can be one or more unquoted column names.
 #'   When provided, the operation is performed on each group separately.
 #' @param return.as One of `"result"`, `"code"`, or `"all"`.
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return Depending on `return.as`: a data frame, a character string, or a list.
 #' @export
-rp_last_k_rows <- function(.data, k, .by=NULL, return.as="result"){
+rp_last_k_rows <- function(.data, k, .by=NULL,table_name=NULL, return.as="result"){
   groupby_str <- translate_groupby(rlang::enquo(.by))
   f_expr <- create_pandas_statement("df", groupby_str = groupby_str, tail_k = k)
-  execute_pandas_statement(r_df = .data, py_command = f_expr, return.as)
+  execute_pandas_statement(r_df = .data, py_command = f_expr, table_name = table_name, return.as)
 }
 
 #' Count rows in a data frame, optionally by groups
@@ -253,10 +260,11 @@ rp_last_k_rows <- function(.data, k, .by=NULL, return.as="result"){
 #' @param .by Optional grouping variables. Can be one or more unquoted column names
 #'   (e.g., `cut` or `c(cut, color)`). When provided, counts are computed per group.
 #' @param return.as One of `"result"`, `"code"`, or `"all"`.
+#' @param table_name An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).
 #' @return A data frame with one column `"n"` (total row count) if `.by = NULL`,
 #'     or a data frame with the grouping columns and a column `"n"` (per‑group counts).
 #' @export
-rp_count <- function(.data, .by = NULL, return.as = "result"){
+rp_count <- function(.data, .by = NULL,table_name=NULL, return.as = "result"){
   by_quo <- rlang::enquo(.by)
   
   if (rlang::quo_is_missing(by_quo) || rlang::quo_is_null(by_quo)) {
@@ -268,5 +276,5 @@ rp_count <- function(.data, .by = NULL, return.as = "result"){
         py_cmd <- paste0("df", groupby_str, ".size().rename(columns={'size': 'n'})")
   }
   
-  execute_pandas_statement(r_df = .data, py_command = py_cmd, return.as = return.as)
+  execute_pandas_statement(r_df = .data, py_command = py_cmd, table_name = table_name, return.as = return.as)
 }

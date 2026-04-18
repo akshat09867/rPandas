@@ -4,7 +4,14 @@
 \alias{rp_calculate}
 \title{Apply multiple summary functions to multiple columns}
 \usage{
-rp_calculate(.data, ..., the.functions, .by = NULL, return.as = "result")
+rp_calculate(
+  .data,
+  ...,
+  the.functions,
+  .by = NULL,
+  table_name = NULL,
+  return.as = "result"
+)
 }
 \arguments{
 \item{.data}{An R data.frame.}
@@ -16,6 +23,8 @@ rp_calculate(.data, ..., the.functions, .by = NULL, return.as = "result")
 "var", "min", "max", "sum".}
 
 \item{.by}{A bare column name or \code{c(col1, col2)} to group by.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{What to return: "result", "code", or "all".}
 }

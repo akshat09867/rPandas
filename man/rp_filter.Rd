@@ -4,12 +4,14 @@
 \alias{rp_filter}
 \title{Filter rows using pandas}
 \usage{
-rp_filter(.data, filter_expression, return.as = "result")
+rp_filter(.data, filter_expression, table_name = NULL, return.as = "result")
 }
 \arguments{
 \item{.data}{An R data.frame or tibble.}
 
 \item{filter_expression}{The filtering expression, written in R syntax.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{What to return: "result", "code", or "all".}
 }

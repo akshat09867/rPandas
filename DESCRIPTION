@@ -1,5 +1,5 @@
 Package: rPandas
-Title: What the Package Does (One Line, Title Case)
+Title: rPandas:  Translating from R to Python's Pandas Package 
 Version: 0.0.0.9000
 Authors@R: 
     c(

@@ -1,11 +1,11 @@
 library(ggplot2)
 
 # Test 1: AND operator
-result1 <- rp_filter(diamonds, carat > 1 & cut == "Ideal", return.as = "code")
+result1 <- rp_filter(.data=diamonds, carat > 1 & cut == "Ideal", table_name = "diamonds",return.as = "all")
 print(head(result1))
 
 # Test 2: OR operator
-result2 <- rp_filter(diamonds, clarity == "VVS1" | clarity == "VVS2")
+result2 <- rp_filter(diamonds, clarity == "VVS1" | clarity == "VVS2", table_name = "diamonds", return.as = "code")
 print(head(result2))
 
 # Test 3: NOT operator
@@ -35,7 +35,7 @@ print(head(result7))
 result8 <- rp_sort(diamonds, "carat", desc(table),return.as='code')
 print(head(result8))
 
-result9 <- rp_mutate(diamonds, price_per_carat=price/carat, depth_pct = depth / 100, )
+result9 <- rp_mutate(diamonds, price_per_carat=price/carat, depth_pct = depth / 100 )
 print(head(result9))
 
 result10 <- rp_summarize(
@@ -43,7 +43,9 @@ result10 <- rp_summarize(
     avg_price = mean(price), 
     std_carat = sd(carat),
     count = n(),
-    .by = c(cut, color)
+    .by = c(cut, color),
+    table_name = "diamonds",
+    return.as = "code"
   )
 print(head(result10))
 
@@ -59,7 +61,7 @@ print(head(result11))
 result12 <- rp_first_k_rows(
   ggplot2::diamonds,
   1,
- .by = c(cut, clarity)
+ .by = c("cut", "clarity")
   )
 
 print(result12)
@@ -90,13 +92,13 @@ result16 <- diamonds %>%
 
 
 
-result12 <- rp_first_k_rows(
+result12b <- rp_first_k_rows(
   ggplot2::diamonds,
-  3,
+  1,
  .by = c(cut, clarity)
   )
 
-print(result12)
+print(result12b)
 
 
 
@@ -110,7 +112,3 @@ print(result12)
 # print(head(rp_last_k_rows(.data = diamonds, k = 3)))
 # print(head(rp_count(.data = diamonds, .by = cut, return.as = "result")))
 # print(head(rp_calculate(.data = diamonds, x, y, z, price, .by = cut, the.functions = c("mean", "median", "sd"))))
-
-
-
-

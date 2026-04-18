@@ -4,7 +4,7 @@
 \alias{rp_last_k_rows}
 \title{Extract the last k rows of a data frame}
 \usage{
-rp_last_k_rows(.data, k, .by = NULL, return.as = "result")
+rp_last_k_rows(.data, k, .by = NULL, table_name = NULL, return.as = "result")
 }
 \arguments{
 \item{.data}{An R data frame (or tibble) to be processed.}
@@ -14,6 +14,8 @@ returns up to k rows per group.}
 
 \item{.by}{Optional grouping variables. Can be one or more unquoted column names.
 When provided, the operation is performed on each group separately.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{One of \code{"result"}, \code{"code"}, or \code{"all"}.}
 }

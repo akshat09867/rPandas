@@ -35,14 +35,14 @@ Return the resulting data.frame back to your R session.
 This allows you to write R code while the data processing is handled by Python's pandas library.
 
 ## Setup and Installation
-Python Dependencies - 
+### Python Dependencies
 rPandas depends on a working Python installation and the pandas library. The reticulate package handles the R-to-Python connection.
 
 You can install pandas into a dedicated R environment by running:
 ```{r }
 reticulate::py_install("pandas")
 ```
-All rPandas functions include a built-in "health check" to help you diagnose this connection. If you have any issues, the rp_check_env() function can provide a detailed report.
+All rPandas functions include a built‑in "health check" to help you diagnose this connection. If you have any issues, the rp_check_env() function can provide a detailed report.
 ```{r}
 # Run this if you have connection issues
 rp_check_env()
@@ -58,19 +58,32 @@ head(diamonds)
 ```
 **1. rp_filter():**
 This verb filters rows based on a logical expression, similar to dplyr::filter().
+It supports common logical operators: & (AND), | (OR), ! (NOT), %in%, and %notin%
 
  ``` {r} 
-# Filter for rows where carat is greater than 1
+# Simple condition
 v1 <- rp_filter(diamonds, carat > 1)
 print(head(v1))
 
-# Filter with a more complex expression
+# AND: multiple conditions
 v2 <- rp_filter(diamonds, carat > 1 & cut == "Ideal")
 print(head(v2))
 
-# Use %in%
-v3 <- rp_filter(diamonds, color %in% c("E", "F") & price > 18000)
+# OR: use | (pipe)
+v3 <- rp_filter(diamonds, color == "D" | color == "E")
 print(head(v3))
+
+# NOT: use !
+v4 <- rp_filter(diamonds, !(price > 10000))
+print(head(v4))
+
+# %in% operator
+v5 <- rp_filter(diamonds, color %in% c("D", "E", "F"))
+print(head(v5))
+
+# %notin% (if implemented)
+v6 <- rp_filter(diamonds, color %notin% c("D", "E", "F"))
+print(head(v6))
  ```
 
 **2. rp_select():**
@@ -86,64 +99,74 @@ print(head(v4))
 This verb sorts the data frame by one or more columns, similar to dplyr::arrange().
 ```{r}
 # Sort by price (ascending by default)
-v5 <- rp_sort(diamonds, price)
-print(head(v5))
+v8 <- rp_sort(diamonds, price)
+print(head(v8))
 
 # Use desc() to sort in descending order
-v6 <- rp_sort(diamonds, desc(price))
-print(head(v6))
+v9 <- rp_sort(diamonds, desc(price))
+print(head(v9))
 
 # Sort by multiple columns
-v7 <- rp_sort(diamonds, cut, desc(price))
-print(head(v7))
+v10 <- rp_sort(diamonds, cut, desc(price))
+print(head(v10))
 ```
 
 
 **4. rp_mutate():**
 This verb creates new columns or modifies existing ones, similar to dplyr::mutate().
-
+You can also remove columns using the to_remove argument.
 ```{r}
 
 # Create a new column
-v8 <- rp_mutate(diamonds, price_per_carat = price / carat)
-print(head(v8))
+v11 <- rp_mutate(diamonds, price_per_carat = price / carat)
+print(head(v11))
 
 # Create multiple columns
-v9 <- rp_mutate(
+v12 <- rp_mutate(
   diamonds, 
   price_per_carat = price / carat,
   depth_pct = depth / 100
 )
-print(head(v9))
+print(head(v12))
+
+# Remove one or more columns
+v13 <- rp_mutate(diamonds, to_remove = c("table", "depth"))
+print(head(v13))
 ```
 
 
 **5. rp_summarize():**
 This verb collapses a data frame into a summary, often after grouping. It is similar to dplyr::summarise().
-
 ```{r}
 
 # Summarize the entire data frame
-v10 <- rp_summarize(diamonds, avg_price = mean(price), max_carat = max(carat))
-print(head(v10))
+v14 <- rp_summarize(diamonds, avg_price = mean(price), max_carat = max(carat))
+print(v14)
 
-# Group by one column
-v11 <- rp_summarize(diamonds, avg_price = mean(price), .by = cut)
-print(head(v11))
+# Group by one column (unquoted)
+v15 <- rp_summarize(diamonds, avg_price = mean(price), .by = cut)
+print(v15)
 
-# Group by multiple columns and get a count
-v12 <- rp_summarize(
+# Group by multiple columns (unquoted)
+v16 <- rp_summarize(
   diamonds, 
   avg_price = mean(price), 
   count = n(),
   .by = c(cut, color)
 )
-print(head(v12))
+print(head(v16))
+
+# Grouping also accepts quoted column names
+v17 <- rp_summarize(
+  diamonds, 
+  avg_price = mean(price), 
+  .by = c("cut", "color")
+)
+print(head(v17))
 ```
 
-**6. rp_calculate():**
-This verb is a powerful alternative to rp_summarize, allowing you to apply multiple functions to multiple columns at once.
-
+**6. rp_calculate()– Apply Multiple Functions to Multiple Columns**
+This verb is a powerful alternative to rp_summarize. It applies the same set of functions (e.g., "mean", "sd") to every selected column.
 ```{r}
 
 # Apply two functions to two columns, grouped by 'cut'
@@ -156,20 +179,50 @@ v13 <- rp_calculate(
 print(head(v13))
 ```
 
+**7. rp_first_k_rows() and rp_last_k_rows() – First/Last K Rows per Group**
+These verbs extract the first or last k rows from the whole data frame, or from each group when .by is provided.
+```{r}
+# First 3 rows overall
+v19 <- rp_first_k_rows(diamonds, k = 3)
+print(v19)
+
+# Last 2 rows per group (cut and clarity)
+v20 <- rp_last_k_rows(diamonds, k = 2, .by = c(cut, clarity))
+print(head(v20))
+
+# Both quoted and unquoted group specifications work
+v21 <- rp_first_k_rows(diamonds, k = 1, .by = c("cut", "color"))
+print(v21)
+```
+
+**8. rp_count() – Count Rows (Overall or by Group)**
+This verb returns the number of rows in the data frame, optionally by groups.
+```{r}
+# Total row count
+v22 <- rp_count(diamonds)
+print(v22)
+
+# Count per group
+v23 <- rp_count(diamonds, .by = cut)
+print(v23)
+
+# Count per combination of multiple groups
+v24 <- rp_count(diamonds, .by = c(cut, color))
+print(head(v24))
+```
+
 ## Chaining Verbs with the Pipe
 All rPandas functions are "pipe-friendly" and use .data as their first argument, allowing you to chain operations together using magrittr's %>% pipe (or the native R |>).
 
 ```{r}
 # Load the pipe
-library(magrittr)
-
-v14 <- diamonds %>%
-  rp_filter(carat > 1 & color == "D") %>%
-  rp_mutate(price_per_carat = price / carat) %>%
-  rp_summarize(avg_ppc = mean(price_per_carat), .by = cut) %>%
+v25 <- diamonds |>
+  rp_filter(carat > 1 & color == "D") |>
+  rp_mutate(price_per_carat = price / carat) |>
+  rp_summarize(avg_ppc = mean(price_per_carat), .by = cut) |>
   rp_sort(desc(avg_ppc))
 
-print(head(v14))
+print(head(v25))
 ```
 
 ## Viewing the Python Code
@@ -192,10 +245,25 @@ rp_mutate(diamonds, ppc = price / carat, return.as = "code")
 
 # See the code for a complex summary
 rp_summarize(
-  diamonds, 
+  diamonds,
   avg_price = mean(price), 
   count = n(),
   .by = c(cut, color),
   return.as = "code"
 )
 ```
+
+## Customizing the Generated Code with table_name
+By default, when you request return.as = "code", the generated Python code uses the placeholder rpandas_df_in as the DataFrame name. This is because the function only receives the 
+data object, not its name. However, you can provide a custom name using the table_name argument (available in all verbs). This is especially useful when you want to copy‑paste the 
+code into a Python script or notebook.
+```{r}
+# Default placeholder
+rp_filter(diamonds, carat > 1, return.as = "code")
+
+# With custom table name
+rp_filter(diamonds, carat > 1, table_name = "diamonds", return.as = "code")
+```
+The output changes from:
+**"rpandas_df_in.query('(carat > 1)')"** to: **"diamonds.query('(carat > 1)')"**.
+This works for all verbs – rp_select, rp_mutate, rp_summarize, etc. Simply pass table_name = "your_data_frame_name" as an argument.

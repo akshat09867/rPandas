@@ -4,7 +4,13 @@
 \alias{rp_mutate}
 \title{Mutate (add/modify/remove) columns using pandas}
 \usage{
-rp_mutate(.data, to_remove = NULL, ..., return.as = "result")
+rp_mutate(
+  .data,
+  to_remove = NULL,
+  ...,
+  table_name = NULL,
+  return.as = "result"
+)
 }
 \arguments{
 \item{.data}{An R data frame.}
@@ -12,6 +18,8 @@ rp_mutate(.data, to_remove = NULL, ..., return.as = "result")
 \item{to_remove}{A character vector of column names to remove.}
 
 \item{...}{Named expressions for new/modified columns.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{Either "result", "code", or "all".}
 }

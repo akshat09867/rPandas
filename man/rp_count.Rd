@@ -4,13 +4,15 @@
 \alias{rp_count}
 \title{Count rows in a data frame, optionally by groups}
 \usage{
-rp_count(.data, .by = NULL, return.as = "result")
+rp_count(.data, .by = NULL, table_name = NULL, return.as = "result")
 }
 \arguments{
 \item{.data}{An R data frame (or tibble) to be processed.}
 
 \item{.by}{Optional grouping variables. Can be one or more unquoted column names
 (e.g., \code{cut} or \code{c(cut, color)}). When provided, counts are computed per group.}
+
+\item{table_name}{An optional character string. If provided, the generated Python code will replace the internal dataframe name with this string (e.g., \code{"diamonds.query(...)"}). This is useful for seeing the exact, copy-pasteable Python code. Defaults to \code{NULL} (uses \code{"df"}).}
 
 \item{return.as}{One of \code{"result"}, \code{"code"}, or \code{"all"}.}
 }
