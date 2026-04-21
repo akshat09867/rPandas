@@ -36,17 +36,52 @@ This allows you to write R code while the data processing is handled by Python's
 
 ## Setup and Installation
 ### Python Dependencies
-rPandas depends on a working Python installation and the pandas library. The reticulate package handles the R-to-Python connection.
+rPandas depends on a working Python installation and the pandas library. The reticulate package handles the R‑to‑Python connection.
 
+### Quick installation (default environment)
 You can install pandas into a dedicated R environment by running:
-```{r }
+
+```{r eval=FALSE}
 reticulate::py_install("pandas")
 ```
-All rPandas functions include a built‑in "health check" to help you diagnose this connection. If you have any issues, the rp_check_env() function can provide a detailed report.
-```{r}
+#### Troubleshooting the Python environment
+
+If you encounter issues (e.g., “pandas not found”), rPandas provides a built‑in health check:
+
+```{r eval=FALSE}
 # Run this if you have connection issues
 rp_check_env()
 ```
+
+The health check prints the Python path reticulate is using and whether `pandas` is installed.
+
+##### Finding and selecting the correct Python environment
+
+You can list all available conda environments (if you use Conda) with:
+
+```{r eval=FALSE}
+reticulate::conda_list()
+```
+
+Once you identify the desired environment (e.g., the first one), you can tell reticulate to use it **before loading rPandas**:
+
+```{r eval=FALSE}
+# Replace with the path from conda_list()
+reticulate::use_python(python = reticulate::conda_list()$python[1], required = TRUE)
+
+# Or, if you prefer to use a conda environment by name:
+reticulate::use_condaenv("your_environment_name", required = TRUE)
+```
+
+For system Python installations, simply provide the path to the Python binary:
+
+```{r eval=FALSE}
+reticulate::use_python("/usr/local/bin/python3", required = TRUE)
+```
+
+After setting the environment, rerun `rp_check_env()` to confirm everything is ready. For more detailed guidance, see the [reticulate documentation](https://rstudio.github.io/reticulate/).
+
+> **Note:** The code chunks above are not executed when building the vignette (they are meant to be run interactively by the user).
 
 ## The Core Verbs
 All examples will use the diamonds dataset from the ggplot2 package.
