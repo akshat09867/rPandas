@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
+knitr::opts_chunk$set(eval=FALSE,
   collapse = TRUE,
   comment = "#>"
 )
@@ -41,14 +41,14 @@ rPandas depends on a working Python installation and the pandas library. The ret
 ### Quick installation (default environment)
 You can install pandas into a dedicated R environment by running:
 
-```{r eval=FALSE}
+```{r}
 reticulate::py_install("pandas")
 ```
 #### Troubleshooting the Python environment
 
 If you encounter issues (e.g., “pandas not found”), rPandas provides a built‑in health check:
 
-```{r eval=FALSE}
+```{r}
 # Run this if you have connection issues
 rp_check_env()
 ```
@@ -59,13 +59,13 @@ The health check prints the Python path reticulate is using and whether `pandas`
 
 You can list all available conda environments (if you use Conda) with:
 
-```{r eval=FALSE}
+```{r}
 reticulate::conda_list()
 ```
 
 Once you identify the desired environment (e.g., the first one), you can tell reticulate to use it **before loading rPandas**:
 
-```{r eval=FALSE}
+```{r}
 # Replace with the path from conda_list()
 reticulate::use_python(python = reticulate::conda_list()$python[1], required = TRUE)
 
@@ -75,7 +75,7 @@ reticulate::use_condaenv("your_environment_name", required = TRUE)
 
 For system Python installations, simply provide the path to the Python binary:
 
-```{r eval=FALSE}
+```{r}
 reticulate::use_python("/usr/local/bin/python3", required = TRUE)
 ```
 
@@ -86,40 +86,85 @@ After setting the environment, rerun `rp_check_env()` to confirm everything is r
 ## The Core Verbs
 All examples will use the diamonds dataset from the ggplot2 package.
 
-```{r}
+```{r eval=TRUE}
 # Make sure ggplot2 is installed to access the data
 data(diamonds, package = "ggplot2")
 head(diamonds)
+
 ```
 **1. rp_filter():**
 This verb filters rows based on a logical expression, similar to dplyr::filter().
 It supports common logical operators: & (AND), | (OR), ! (NOT), %in%, and %notin%
 
- ``` {r} 
+```{r} 
 # Simple condition
 v1 <- rp_filter(diamonds, carat > 1)
 print(head(v1))
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  1.17 Very Good     J      I1  60.2    61  2774 6.83 6.90 4.13
+#> 2  1.01   Premium     F      I1  61.8    60  2781 6.39 6.36 3.94
+#> 3  1.01      Fair     E      I1  64.5    58  2788 6.29 6.21 4.03
+#> 4  1.01   Premium     H     SI2  62.7    59  2788 6.31 6.22 3.93
+#> 5  1.05 Very Good     J     SI2  63.2    56  2789 6.49 6.45 4.09
+#> 6  1.05      Fair     J     SI2  65.8    59  2789 6.41 6.27 4.18
 
 # AND: multiple conditions
 v2 <- rp_filter(diamonds, carat > 1 & cut == "Ideal")
 print(head(v2))
+#>   carat   cut color clarity depth table price    x    y    z
+#> 1  1.01 Ideal     I      I1  61.5    57  2844 6.45 6.46 3.97
+#> 2  1.02 Ideal     H     SI2  61.6    55  2856 6.49 6.43 3.98
+#> 3  1.02 Ideal     I      I1  61.7    56  2872 6.44 6.49 3.99
+#> 4  1.02 Ideal     J     SI2  60.3    54  2879 6.53 6.50 3.93
+#> 5  1.01 Ideal     I      I1  61.5    57  2896 6.46 6.45 3.97
+#> 6  1.02 Ideal     I      I1  61.7    56  2925 6.49 6.44 3.99
 
 # OR: use | (pipe)
 v3 <- rp_filter(diamonds, color == "D" | color == "E")
 print(head(v3))
+#>   carat     cut color clarity depth table price    x    y    z
+#> 1  0.23   Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21 Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23    Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.22    Fair     E     VS2  65.1    61   337 3.87 3.78 2.49
+#> 5  0.20 Premium     E     SI2  60.2    62   345 3.79 3.75 2.27
+#> 6  0.32 Premium     E      I1  60.9    58   345 4.38 4.42 2.68
+
 
 # NOT: use !
 v4 <- rp_filter(diamonds, !(price > 10000))
 print(head(v4))
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
+
 
 # %in% operator
 v5 <- rp_filter(diamonds, color %in% c("D", "E", "F"))
 print(head(v5))
+#>   carat     cut color clarity depth table price    x    y    z
+#> 1  0.23   Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21 Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23    Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.22    Fair     E     VS2  65.1    61   337 3.87 3.78 2.49
+#> 5  0.22 Premium     F     SI1  60.4    61   342 3.88 3.84 2.33
+#> 6  0.20 Premium     E     SI2  60.2    62   345 3.79 3.75 2.27
 
 # %notin% (if implemented)
 v6 <- rp_filter(diamonds, color %notin% c("D", "E", "F"))
 print(head(v6))
- ```
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 2  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 3  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
+#> 4  0.24 Very Good     I    VVS1  62.3    57   336 3.95 3.98 2.47
+#> 5  0.26 Very Good     H     SI1  61.9    55   337 4.07 4.11 2.53
+#> 6  0.23 Very Good     H     VS1  59.4    61   338 4.00 4.05 2.39
+```
 
 **2. rp_select():**
 This verb selects specific columns by name, similar to dplyr::select().
@@ -128,6 +173,13 @@ This verb selects specific columns by name, similar to dplyr::select().
 # Select three columns
 v4 <- rp_select(diamonds, carat, cut, price)
 print(head(v4))
+#>   carat       cut price
+#> 1  0.23     Ideal   326
+#> 2  0.21   Premium   326
+#> 3  0.23      Good   327
+#> 4  0.29   Premium   334
+#> 5  0.31      Good   335
+#> 6  0.24 Very Good   336
 ```
 
 **3. rp_sort():**
@@ -136,14 +188,35 @@ This verb sorts the data frame by one or more columns, similar to dplyr::arrange
 # Sort by price (ascending by default)
 v8 <- rp_sort(diamonds, price)
 print(head(v8))
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     I    VVS1  62.3    57   336 3.95 3.98 2.47
 
 # Use desc() to sort in descending order
 v9 <- rp_sort(diamonds, desc(price))
 print(head(v9))
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  2.29   Premium     I     VS2  60.8    60 18823 8.50 8.47 5.16
+#> 2  2.00 Very Good     G     SI1  63.5    56 18818 7.90 7.97 5.04
+#> 3  1.51     Ideal     G      IF  61.7    55 18806 7.37 7.41 4.56
+#> 4  2.07     Ideal     G     SI2  62.5    55 18804 8.20 8.13 5.11
+#> 5  2.00 Very Good     H     SI1  62.8    57 18803 7.95 8.00 5.01
+#> 6  2.29   Premium     I     SI1  61.8    59 18797 8.52 8.45 5.24
 
 # Sort by multiple columns
 v10 <- rp_sort(diamonds, cut, desc(price))
 print(head(v10))
+#>   carat  cut color clarity depth table price     x     y    z
+#> 1  2.01 Fair     G     SI1  70.6    64 18574  7.43  6.64 4.69
+#> 2  2.02 Fair     H     VS2  64.5    57 18565  8.00  7.95 5.14
+#> 3  4.50 Fair     J      I1  65.8    58 18531 10.23 10.16 6.72
+#> 4  2.00 Fair     G     VS2  67.6    58 18515  7.65  7.61 5.16
+#> 5  2.51 Fair     H     SI2  64.7    57 18308  8.44  8.50 5.48
+#> 6  3.01 Fair     I     SI2  65.8    56 18242  8.99  8.94 5.90
 ```
 
 
@@ -155,6 +228,20 @@ You can also remove columns using the to_remove argument.
 # Create a new column
 v11 <- rp_mutate(diamonds, price_per_carat = price / carat)
 print(head(v11))
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
+#>   price_per_carat
+#> 1        1417.391
+#> 2        1552.381
+#> 3        1421.739
+#> 4        1151.724
+#> 5        1080.645
+#> 6        1400.000
 
 # Create multiple columns
 v12 <- rp_mutate(
@@ -163,10 +250,31 @@ v12 <- rp_mutate(
   depth_pct = depth / 100
 )
 print(head(v12))
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
+#>   price_per_carat depth_pct
+#> 1        1417.391     0.615
+#> 2        1552.381     0.598
+#> 3        1421.739     0.569
+#> 4        1151.724     0.624
+#> 5        1080.645     0.633
+#> 6        1400.000     0.628
 
 # Remove one or more columns
 v13 <- rp_mutate(diamonds, to_remove = c("table", "depth"))
 print(head(v13))
+#>   carat       cut color clarity price    x    y    z
+#> 1  0.23     Ideal     E     SI2   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     J    VVS2   336 3.94 3.96 2.48
 ```
 
 
@@ -177,10 +285,20 @@ This verb collapses a data frame into a summary, often after grouping. It is sim
 # Summarize the entire data frame
 v14 <- rp_summarize(diamonds, avg_price = mean(price), max_carat = max(carat))
 print(v14)
+#>    price carat
+#> 1 3932.8   NaN
+#> 2    NaN  5.01
+
 
 # Group by one column (unquoted)
 v15 <- rp_summarize(diamonds, avg_price = mean(price), .by = cut)
 print(v15)
+#>         cut avg_price
+#> 1      Fair  4358.758
+#> 2      Good  3928.864
+#> 3 Very Good  3981.760
+#> 4   Premium  4584.258
+#> 5     Ideal  3457.542
 
 # Group by multiple columns (unquoted)
 v16 <- rp_summarize(
@@ -190,6 +308,13 @@ v16 <- rp_summarize(
   .by = c(cut, color)
 )
 print(head(v16))
+#>    cut color avg_price count
+#> 1 Fair     D  4291.061   163
+#> 2 Fair     E  3682.312   224
+#> 3 Fair     F  3827.003   312
+#> 4 Fair     G  4239.255   314
+#> 5 Fair     H  5135.683   303
+#> 6 Fair     I  4685.446   175
 
 # Grouping also accepts quoted column names
 v17 <- rp_summarize(
@@ -198,6 +323,13 @@ v17 <- rp_summarize(
   .by = c("cut", "color")
 )
 print(head(v17))
+#>    cut color avg_price
+#> 1 Fair     D  4291.061
+#> 2 Fair     E  3682.312
+#> 3 Fair     F  3827.003
+#> 4 Fair     G  4239.255
+#> 5 Fair     H  5135.683
+#> 6 Fair     I  4685.446
 ```
 
 **6. rp_calculate()– Apply Multiple Functions to Multiple Columns**
@@ -212,22 +344,76 @@ v13 <- rp_calculate(
   .by = cut
 )
 print(head(v13))
+#>         cut price.mean price.std carat.mean carat.std
+#> 1      Fair   4358.758  3560.387  1.0461366 0.5164043
+#> 2      Good   3928.864  3681.590  0.8491847 0.4540544
+#> 3 Very Good   3981.760  3935.862  0.8063814 0.4594354
+#> 4   Premium   4584.258  4349.205  0.8919549 0.5152616
+#> 5     Ideal   3457.542  3808.401  0.7028370 0.4328763
 ```
 
 **7. rp_first_k_rows() and rp_last_k_rows() – First/Last K Rows per Group**
 These verbs extract the first or last k rows from the whole data frame, or from each group when .by is provided.
-```{r}
+```{r} 
 # First 3 rows overall
 v19 <- rp_first_k_rows(diamonds, k = 3)
 print(v19)
+#>   carat     cut color clarity depth table price    x    y    z
+#> 1  0.23   Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21 Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23    Good     E     VS1  56.9    65   327 4.05 4.07 2.31
 
 # Last 2 rows per group (cut and clarity)
 v20 <- rp_last_k_rows(diamonds, k = 2, .by = c(cut, clarity))
 print(head(v20))
+#>   carat     cut color clarity depth table price    x    y    z
+#> 1  0.70    Fair     J    VVS1  67.6    54  1691 5.56 5.41 3.71
+#> 2  0.50    Fair     D    VVS1  65.9    64  1792 4.92 5.03 3.28
+#> 3  0.52    Fair     F      IF  64.6    58  2144 5.04 5.17 3.30
+#> 4  0.47    Fair     D      IF  60.6    60  2211 5.09 4.98 3.05
+#> 5  0.55    Good     F      IF  60.8    60  2266 5.26 5.36 3.23
+#> 6  0.54 Premium     F      IF  61.9    60  2391 5.26 5.21 3.24
 
 # Both quoted and unquoted group specifications work
 v21 <- rp_first_k_rows(diamonds, k = 1, .by = c("cut", "color"))
 print(v21)
+#>    carat       cut color clarity depth table price    x    y    z
+#> 1   0.23     Ideal     E     SI2  61.5  55.0   326 3.95 3.98 2.43
+#> 2   0.21   Premium     E     SI1  59.8  61.0   326 3.89 3.84 2.31
+#> 3   0.23      Good     E     VS1  56.9  65.0   327 4.05 4.07 2.31
+#> 4   0.29   Premium     I     VS2  62.4  58.0   334 4.20 4.23 2.63
+#> 5   0.31      Good     J     SI2  63.3  58.0   335 4.34 4.35 2.75
+#> 6   0.24 Very Good     J    VVS2  62.8  57.0   336 3.94 3.96 2.48
+#> 7   0.24 Very Good     I    VVS1  62.3  57.0   336 3.95 3.98 2.47
+#> 8   0.26 Very Good     H     SI1  61.9  55.0   337 4.07 4.11 2.53
+#> 9   0.22      Fair     E     VS2  65.1  61.0   337 3.87 3.78 2.49
+#> 10  0.23     Ideal     J     VS1  62.8  56.0   340 3.93 3.90 2.46
+#> 11  0.22   Premium     F     SI1  60.4  61.0   342 3.88 3.84 2.33
+#> 12  0.30     Ideal     I     SI2  62.0  54.0   348 4.31 4.34 2.68
+#> 13  0.30      Good     I     SI2  63.3  56.0   351 4.26 4.30 2.71
+#> 14  0.23 Very Good     E     VS2  63.8  55.0   352 3.85 3.92 2.48
+#> 15  0.23 Very Good     G    VVS2  60.4  58.0   354 3.97 4.01 2.41
+#> 16  0.23 Very Good     D     VS2  60.5  61.0   357 3.96 3.97 2.40
+#> 17  0.23 Very Good     F     VS1  60.9  57.0   357 3.96 3.99 2.42
+#> 18  0.23      Good     F     VS1  58.2  59.0   402 4.06 4.08 2.37
+#> 19  0.31      Good     H     SI1  64.0  54.0   402 4.29 4.31 2.75
+#> 20  0.26      Good     D     VS2  65.2  56.0   403 3.99 4.02 2.61
+#> 21  0.23     Ideal     G     VS1  61.9  54.0   404 3.93 3.95 2.44
+#> 22  0.22   Premium     D     VS2  59.3  62.0   404 3.91 3.88 2.31
+#> 23  0.30   Premium     J     SI2  59.3  61.0   405 4.43 4.38 2.61
+#> 24  0.30     Ideal     D     SI1  62.5  57.0   552 4.29 4.32 2.69
+#> 25  0.31   Premium     G     SI1  61.8  58.0   553 4.35 4.32 2.68
+#> 26  0.30   Premium     H     SI1  62.9  59.0   554 4.28 4.24 2.68
+#> 27  0.96      Fair     F     SI2  66.3  62.0  2759 6.27 5.95 4.07
+#> 28  0.81     Ideal     F     SI2  58.8  57.0  2761 6.14 6.11 3.60
+#> 29  0.91      Fair     H     SI2  64.4  57.0  2763 6.11 6.09 3.93
+#> 30  0.77     Ideal     H     VS2  62.0  56.0  2763 5.89 5.86 3.64
+#> 31  0.72      Good     G     VS2  59.7  60.5  2776 5.80 5.84 3.47
+#> 32  0.84      Fair     G     SI1  55.1  67.0  2782 6.39 6.20 3.47
+#> 33  1.05      Fair     J     SI2  65.8  59.0  2789 6.41 6.27 4.18
+#> 34  0.90      Fair     I     SI1  67.3  59.0  2804 5.93 5.84 3.96
+#> 35  0.75      Fair     D     SI2  64.6  57.0  2848 5.74 5.72 3.70
+
 ```
 
 **8. rp_count() – Count Rows (Overall or by Group)**
@@ -236,14 +422,29 @@ This verb returns the number of rows in the data frame, optionally by groups.
 # Total row count
 v22 <- rp_count(diamonds)
 print(v22)
+#>       n
+#> 1 53940
 
 # Count per group
 v23 <- rp_count(diamonds, .by = cut)
 print(v23)
+#>         cut     n
+#> 1      Fair  1610
+#> 2      Good  4906
+#> 3 Very Good 12082
+#> 4   Premium 13791
+#> 5     Ideal 21551
 
 # Count per combination of multiple groups
 v24 <- rp_count(diamonds, .by = c(cut, color))
 print(head(v24))
+#>    cut color   n
+#> 1 Fair     D 163
+#> 2 Fair     E 224
+#> 3 Fair     F 312
+#> 4 Fair     G 314
+#> 5 Fair     H 303
+#> 6 Fair     I 175
 ```
 
 ## Chaining Verbs with the Pipe
@@ -258,6 +459,12 @@ v25 <- diamonds |>
   rp_sort(desc(avg_ppc))
 
 print(head(v25))
+#>         cut  avg_ppc
+#> 1     Ideal 7546.163
+#> 2 Very Good 6789.316
+#> 3   Premium 6548.397
+#> 4      Good 5784.918
+#> 5      Fair 5414.87
 ```
 
 ## Viewing the Python Code
@@ -274,9 +481,11 @@ You can set return.as to:
 ```{r}
 # See the code for a simple filter
 rp_filter(diamonds, carat > 1 & price < 400, return.as = "code")
+#> [1] "df.query('(carat > 1) and (price < 400)')"
 
 # See the code for a mutate
 rp_mutate(diamonds, ppc = price / carat, return.as = "code")
+#> [1] "df.assign(ppc = lambda x: (x['price'] / x['carat']))"
 
 # See the code for a complex summary
 rp_summarize(
@@ -286,6 +495,7 @@ rp_summarize(
   .by = c(cut, color),
   return.as = "code"
 )
+#> [1] "df.groupby(['cut', 'color'], as_index=False, observed=True).agg(avg_price = ('price', 'mean'), count = ('price', 'size'))"
 ```
 
 ## Customizing the Generated Code with table_name
@@ -295,9 +505,12 @@ code into a Python script or notebook.
 ```{r}
 # Default placeholder
 rp_filter(diamonds, carat > 1, return.as = "code")
+#> [1] "df.query('carat > 1')"
 
 # With custom table name
 rp_filter(diamonds, carat > 1, table_name = "diamonds", return.as = "code")
+#> [1] "diamonds.query('carat > 1')"
+
 ```
 The output changes from:
 **"rpandas_df_in.query('(carat > 1)')"** to: **"diamonds.query('(carat > 1)')"**.
