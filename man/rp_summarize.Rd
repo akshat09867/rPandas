@@ -27,6 +27,7 @@ It translates R's \code{dplyr::summarise} syntax into a pandas \verb{.groupby().
 command.
 }
 \examples{
+\donttest{
 if (reticulate::py_available(initialize = TRUE) &&
     reticulate::py_module_available("pandas")) {
   
@@ -40,5 +41,6 @@ if (reticulate::py_available(initialize = TRUE) &&
                avg_price = mean(price), 
                count = n(),
                .by = c(cut, color))
+}
 }
 }

@@ -36,6 +36,7 @@ Applies a list of summary functions to a list of columns, after
 optionally grouping the data.
 }
 \examples{
+\donttest{
 if (reticulate::py_available(initialize = TRUE) &&
     reticulate::py_module_available("pandas")) {
 
@@ -45,5 +46,6 @@ if (reticulate::py_available(initialize = TRUE) &&
     the.functions = c("mean", "sd"),
     .by = cut
   )
+}
 }
 }

@@ -3,15 +3,24 @@
 #' @description
 #' This function checks if the user's system is correctly configured with Python
 #' and the pandas library. If dependencies are missing, it stops with a
-#' detailed diagnostic report and actionable instructions, including listing
-#' available conda environments if applicable.
+#' detailed diagnostic report and actionable instructions (only in interactive sessions).
+#' In non‑interactive contexts (e.g., CRAN checks), it issues a warning and returns FALSE.
 #'
 #' @export
-#' @return Invisibly returns `TRUE` if all checks pass.
+#' @return Invisibly returns `TRUE` if all checks pass, otherwise `FALSE`.
 rp_check_env <- function() {
+  # Helper to produce error or warning depending on context
+  notify <- function(msg, is_error = FALSE) {
+    if (interactive() && is_error) {
+      stop(msg, call. = FALSE)
+    } else {
+      warning(msg, call. = FALSE, immediate. = TRUE)
+      return(FALSE)
+    }
+  }
 
   if (!reticulate::py_available(initialize = TRUE)) {
-    stop(
+    msg <- paste0(
       "Python could not be found by reticulate.\n\n",
       "--- How to Fix ---\n",
       "Option 1 (recommended): Install Miniconda (self-contained Python)\n",
@@ -21,9 +30,9 @@ rp_check_env <- function() {
       '  reticulate::use_python("/path/to/your/python", required = TRUE)\n',
       "  Find your Python path with: Sys.which('python')\n\n",
       "After fixing, restart R and try again.\n",
-      "------------------------------",
-      call. = FALSE
+      "------------------------------"
     )
+    return(notify(msg, is_error = TRUE))
   }
 
   if (!reticulate::py_module_available("pandas")) {
@@ -67,7 +76,7 @@ rp_check_env <- function() {
       '  reticulate::use_python("/correct/path", required = TRUE)\n',
       "------------------------------"
     )
-    stop(msg, call. = FALSE)
+    return(notify(msg, is_error = TRUE))
   }
 
   invisible(TRUE)

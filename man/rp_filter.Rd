@@ -22,10 +22,10 @@ A \code{data.frame} containing the filtered rows.
 Filters a data frame using an R expression translated to pandas.
 }
 \examples{
-# Only run the example when the reticulate package is installed
-if (requireNamespace("reticulate", quietly = TRUE) &&
-    reticulate::py_available(initialize = TRUE) &&
+\donttest{
+if (reticulate::py_available(initialize = TRUE) &&
     reticulate::py_module_available("pandas")) {
-  rp_filter(ggplot2::diamonds, carat > 1 & price < 4000)
+      rp_filter(ggplot2::diamonds, carat > 1 & price < 4000)
+}
 }
 }

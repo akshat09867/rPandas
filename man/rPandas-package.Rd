@@ -14,7 +14,7 @@ interact with Python's pandas library using familiar R syntax.
 
 Authors:
 \itemize{
-  \item Rihaan Satia \email{first.last@example.com}
+  \item Rihaan Satia
   \item David Shilane \email{david.shilane@columbia.edu}
 }
 

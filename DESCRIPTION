@@ -1,13 +1,18 @@
 Package: rPandas
-Title: rPandas:  Translating from R to Python's Pandas Package 
-Version: 0.0.0.9000
+Title: Translating from R to Python's Pandas Package
+Version: 0.1.4
 Authors@R: 
     c(
-        person("Akshat", "Maurya", , "codingmaster902@gmail.com", role = c("aut", "cre")),
-        person("Rihaan", "Satia", , "first.last@example.com", role = c("aut")),
-        person("David", "Shilane", , "david.shilane@columbia.edu", role = c("aut"))
+        person("Akshat", "Maurya", email = "codingmaster902@gmail.com", role = c("aut", "cre")),
+        person("Rihaan", "Satia", role = "aut"),
+        person("David", "Shilane", email = "david.shilane@columbia.edu", role = "aut")
     )
-Description: What the package does (one paragraph).
+Description: Provides an R interface to Python's 'pandas' library using non-standard
+    evaluation. Users can write R code (e.g., rp_filter(), rp_select(), rp_mutate())
+    that is translated into pandas commands and executed via 'reticulate'. Supports
+    chaining, grouping, and 'summarisation', and includes a 'table_name' parameter to
+    generate 'copy-pasteable' Python code. Ideal for leveraging pandas' speed and
+    flexibility within the R ecosystem.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

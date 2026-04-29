@@ -24,10 +24,12 @@ Sorts a data frame by one or more columns. It translates the R expressions
 into a pandas \code{.sort_values()} command and executes it.
 }
 \examples{
+\donttest{
 if (reticulate::py_available(initialize = TRUE) &&
     reticulate::py_module_available("pandas")) {
   
   # Sort by cut (ascending) and price (descending)
   rp_sort(ggplot2::diamonds, cut, desc(price))
+}
 }
 }

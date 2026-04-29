@@ -7,11 +7,11 @@
 rp_check_env()
 }
 \value{
-Invisibly returns \code{TRUE} if all checks pass.
+Invisibly returns \code{TRUE} if all checks pass, otherwise \code{FALSE}.
 }
 \description{
 This function checks if the user's system is correctly configured with Python
 and the pandas library. If dependencies are missing, it stops with a
-detailed diagnostic report and actionable instructions, including listing
-available conda environments if applicable.
+detailed diagnostic report and actionable instructions (only in interactive sessions).
+In non‑interactive contexts (e.g., CRAN checks), it issues a warning and returns FALSE.
 }

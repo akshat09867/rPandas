@@ -23,8 +23,10 @@ Selects specific columns from a data frame. It captures the bare column
 names and translates the operation into a pandas selection command.
 }
 \examples{
+\donttest{
 if (reticulate::py_available(initialize = TRUE) &&
     reticulate::py_module_available("pandas")) {
   rp_select(ggplot2::diamonds, carat, cut, price)
+}
 }
 }

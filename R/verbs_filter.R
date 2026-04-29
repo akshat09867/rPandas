@@ -9,11 +9,11 @@
 #' @return A `data.frame` containing the filtered rows.
 #' @export
 #' @examples
-#' # Only run the example when the reticulate package is installed
-#' if (requireNamespace("reticulate", quietly = TRUE) &&
-#'     reticulate::py_available(initialize = TRUE) &&
+#' \donttest{
+#' if (reticulate::py_available(initialize = TRUE) &&
 #'     reticulate::py_module_available("pandas")) {
-#'   rp_filter(ggplot2::diamonds, carat > 1 & price < 4000)
+#'       rp_filter(ggplot2::diamonds, carat > 1 & price < 4000)
+#' }
 #' }
 
 rp_filter <- function(.data, filter_expression, table_name = NULL,return.as = "result") {
@@ -39,9 +39,11 @@ rp_filter <- function(.data, filter_expression, table_name = NULL,return.as = "r
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' if (reticulate::py_available(initialize = TRUE) &&
 #'     reticulate::py_module_available("pandas")) {
 #'   rp_select(ggplot2::diamonds, carat, cut, price)
+#' }
 #' }
 rp_select <- function(.data, ..., table_name=NULL,return.as='result'){
   rp_check_env()
@@ -66,11 +68,13 @@ rp_select <- function(.data, ..., table_name=NULL,return.as='result'){
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' if (reticulate::py_available(initialize = TRUE) &&
 #'     reticulate::py_module_available("pandas")) {
 #'   
 #'   # Sort by cut (ascending) and price (descending)
 #'   rp_sort(ggplot2::diamonds, cut, desc(price))
+#' }
 #' }
 rp_sort <- function(.data, ...,table_name=NULL,return.as='result') {
   rp_check_env()
@@ -126,6 +130,7 @@ rp_mutate <- function(.data, to_remove = NULL, ...,table_name=NULL, return.as = 
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' if (reticulate::py_available(initialize = TRUE) &&
 #'     reticulate::py_module_available("pandas")) {
 #'   
@@ -139,6 +144,7 @@ rp_mutate <- function(.data, to_remove = NULL, ...,table_name=NULL, return.as = 
 #'                avg_price = mean(price), 
 #'                count = n(),
 #'                .by = c(cut, color))
+#' }
 #' }
 rp_summarize <- function(.data, ..., .by = NULL,table_name=NULL,return.as='result') {
   rp_check_env()
@@ -175,6 +181,7 @@ rp_summarize <- function(.data, ..., .by = NULL,table_name=NULL,return.as='resul
 #' @return A `data.frame` with the summarized and grouped data.
 #' @export
 #' @examples
+#' \donttest{
 #' if (reticulate::py_available(initialize = TRUE) &&
 #'     reticulate::py_module_available("pandas")) {
 #'
@@ -184,6 +191,7 @@ rp_summarize <- function(.data, ..., .by = NULL,table_name=NULL,return.as='resul
 #'     the.functions = c("mean", "sd"),
 #'     .by = cut
 #'   )
+#' }
 #' }
 rp_calculate <- function(.data, ..., the.functions, .by = NULL,table_name=NULL,return.as='result') {
   rp_check_env()
